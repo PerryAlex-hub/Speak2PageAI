@@ -1,12 +1,35 @@
 import type {Metadata} from "next";
-import {IBM_Plex_Sans as FontSans} from "next/font/google";
-import { cn } from "@/lib/utils";
+import localFont from "next/font/local";
+import Header from "../components/home/Header";
+import {cn} from "@/lib/utils";
 import "./globals.css";
+import {ClerkProvider} from "@clerk/nextjs";
 
-const fontSans = FontSans({
-  weight: ["300", "400", "500", "700"],
-  subsets: ["latin"],
-  variable: "--font-sans"
+const fontSans = localFont({
+  src: [
+    {
+      path: "./fonts/IBMPlexSans-Light.ttf",
+      weight: "300",
+      style: "normal",
+    },
+    {
+      path: "./fonts/IBMPlexSans-Regular.ttf",
+      weight: "400",
+      style: "normal",
+    },
+    {
+      path: "./fonts/IBMPlexSans-Medium.ttf",
+      weight: "500",
+      style: "normal",
+    },
+    {
+      path: "./fonts/IBMPlexSans-Bold.ttf",
+      weight: "700",
+      style: "normal",
+    },
+  ],
+  variable: "--font-sans",
+  display: "swap",
 });
 
 export const metadata: Metadata = {
@@ -20,11 +43,18 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body className= {cn(
-        "min-h-screen bg-background font-sans antialiased",
-        fontSans.variable 
-      )}>{children}</body>
-    </html>
+    <ClerkProvider>
+      <html lang="en">
+        <body
+          className={cn(
+            "min-h-screen bg-background font-sans antialiased",
+            fontSans.variable
+          )}
+        >
+          <Header />
+          <main> {children} </main>.
+        </body>
+      </html>
+    </ClerkProvider>
   );
 }

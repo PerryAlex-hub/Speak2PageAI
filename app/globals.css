@@ -1,5 +1,7 @@
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;700&display=swap');
 @import "tailwindcss";
 @import "tw-animate-css";
+
 
 @custom-variant dark (&:is(.dark *));
 
@@ -76,6 +78,7 @@
   --sidebar-accent-foreground: oklch(0.208 0.042 265.755);
   --sidebar-border: oklch(0.929 0.013 255.508);
   --sidebar-ring: oklch(0.704 0.04 256.788);
+  font-family: var(--font-sans);
 }
 
 .dark {
@@ -124,16 +127,17 @@ body {
   h1 {
     @apply text-4xl md:text-6xl xl:text-7xl font-bold;
   }
+  
   h2{
-    @apply: text-xl lg:text-4xl font-medium;
+    @apply text-xl lg:text-4xl font-medium;
   }
   h3{
-    @apply: text-2xl lg:text-4xl font-medium;
+    @apply text-2xl lg:text-4xl font-medium;
   }
   a{
-    @apply: hover:cursor-pointer;
+    @apply hover:cursor-pointer;
   }
   button{
-    @apply: hover:cursor-pointer bg-purple-600 hover:bg-purple-700;
+    @apply hover:cursor-pointer bg-purple-600 hover:bg-purple-700;
   }
 }
