@@ -1,3 +1,4 @@
+import {SignedIn, SignedOut, SignInButton, UserButton} from "@clerk/nextjs";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -38,15 +39,26 @@ const Header = () => {
 
       <div className="flex lg:justify-center gap-2 lg:gap-12 lg:items-center">
         <NavLink href="/#pricing">Pricing</NavLink>
-        <NavLink href="/#posts">Your Posts</NavLink>
+        <SignedIn>
+          <NavLink href="/#posts">Your Posts</NavLink>
+        </SignedIn>
       </div>
 
       <div className="flex lg:justify-end lg:flex-1">
-        <div>
-          <NavLink href="/dashboard"> Upload a Video </NavLink>
-          {/* Profile */}
+        <div className="flex items-center justify-center gap-4">
+          <SignedIn>
+            <NavLink href="/dashboard"> Upload a Video </NavLink>
+
+            {/* Profile */}
+
+            <UserButton />
+          </SignedIn>
         </div>
-        <NavLink href="/sign-in">Sign In</NavLink>
+        <SignedOut>
+          <SignInButton>
+            <NavLink href="/sign-in">Sign In</NavLink>
+          </SignInButton>
+        </SignedOut>
       </div>
     </nav>
   );
