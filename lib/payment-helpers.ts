@@ -20,9 +20,9 @@ export async function handleChargeSuccess(data: PaystackChargeData) {
   // Example: Log the charge data
   console.log("Charge successful:", data);
   const customer = data.customer;
-  const priceId = data.plan?.plan_code
+  const priceId = data.plan?.plan_code;
   const plan = data.plan;
-  const status = data.status
+  const status = data.status;
   const sql = await getDbConnection();
   if ("email" in customer && priceId) {
     await createOrUpdateUser(customer, sql);
@@ -48,7 +48,7 @@ async function createOrUpdateUser(customer: PaystackCustomer, sql: any) {
 async function updateUserSubscription(
   sql: any,
   email: string,
-  priceId?: string,
+  priceId?: string
 ) {
   try {
     await sql`UPDATE users SET price_id = ${priceId}, status = 'active' where email = ${email}`;
@@ -57,7 +57,13 @@ async function updateUserSubscription(
   }
 }
 
-async function insertPayment(sql: any, email: string, priceId?: string, plan?: PaystackPlan, status?: string) {
+async function insertPayment(
+  sql: any,
+  email: string,
+  priceId?: string,
+  plan?: PaystackPlan,
+  status?: string
+) {
   try {
     await sql`INSERT INTO payments (amount, status, paystack_payment_id, price_id, user_email) VALUES (${plan?.amount}, ${status}, ${plan?.id}, ${priceId}, ${email})`;
   } catch (err) {
