@@ -3,13 +3,12 @@ import {SignIn} from "@clerk/nextjs";
 
 const page = () => {
   return (
-    <main className="pt-20">
-    <section className="flex justify-center  py-90">
+    <section className="flex justify-center pt-20">
       <BgGradient>
         <SignIn />
       </BgGradient>
     </section>
-    </main>
+
   );
 };
 

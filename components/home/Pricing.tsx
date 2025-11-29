@@ -8,16 +8,20 @@ const Pricing = () => {
       id: "basic",
       name: "Basic",
       description: "Get started with Speak2Page!",
-      price: "10",
+      price: "2,500",
       items: ["3 Blog Posts", "3 Transcriptions"],
+      paymentLink: "https://paystack.shop/pay/zcpwrrhqws",
+      priceId: process.env.NODE_ENV === "development" ? "PLN_woyl75nsciaj5df" : ""
     },
 
     {
       id: "pro",
       name: "Pro",
       description: "All Blog Posts, let's go!",
-      price: "19.99",
+      price: "10,000",
       items: ["Unlimited Blog Posts", "Unlimited Transcriptions"],
+      paymentLink: "https://paystack.shop/pay/9w45i57enf",
+      priceId: process.env.NODE_ENV === "development" ? "PLN_qrho3w4qnusfq2e" : ""
     },
   ];
 
@@ -31,7 +35,7 @@ const Pricing = () => {
           </h2>
         </div>
         <div className="relative flex flex-col lg:flex-row items-center lg:items-stretch gap-8 justify-center">
-          {plansMap.map(({name, price, description, items, id}, idx) => (
+          {plansMap.map(({name, price, description, items, id, paymentLink}, idx) => (
             <div key={idx} className="max-w-lg w-full relative">
               <div
                 className={`relative flex flex-col gap-4 lg:gap-8 h-full z-10 p-8 rounded-box border-[1px]  rounded-2xl ${
@@ -51,12 +55,12 @@ const Pricing = () => {
                 <div className="flex gap-2">
                   <p className="tracking-tight font-extrabold text-5xl">
                     {" "}
-                    ${price}{" "}
+                    ₦{price}{" "}
                   </p>
                   <div className="flex flex-col justify-end mb-[4px]">
                     <p className="text-xs text-base-content/60 uppercase font-semibold">
                       {" "}
-                      USD{" "}
+                      NGN{" "}
                     </p>
                     <p className="text-xs text-base-content/60 ">/month</p>
                   </div>
@@ -72,11 +76,11 @@ const Pricing = () => {
                 <div className="space-y-2">
                   <Button
                     variant={"link"}
-                    className={`border-2 bg-black text-gray-100 rounded-full flex ${
+                    className={`border-2 bg-black text-gray-100 hover:bg-violet-600 py-5 rounded-full flex ${
                       id === "pro" ? "border-amber-300 px-4" : ""
                     } gap-2`}
                   >
-                    <Link href="/" className="flex gap-1 items-center">
+                    <Link href={paymentLink} className="flex gap-1 items-center">
                       {" "}
                       Get Speak2Page <ArrowRight size={18} />{" "}
                     </Link>
