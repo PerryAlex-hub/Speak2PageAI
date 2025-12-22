@@ -1,4 +1,4 @@
-import { handleChargeSuccess } from "@/lib/payment-helpers";
+import {handleChargeSuccess, handleSubscriptionDisable} from "@/lib/payment-helpers";
 import {NextRequest, NextResponse} from "next/server";
 
 export async function POST(req: NextRequest) {
@@ -32,14 +32,14 @@ export async function POST(req: NextRequest) {
     }
 
     const event = body.event;
-    console.log(event)
+    console.log(event);
 
     switch (event) {
       case "charge.success":
         console.log("Handle successful payment", body.data);
-        const session = body.data
+        const session = body.data;
         //connect to db create or update user
-        await handleChargeSuccess(session); 
+        await handleChargeSuccess(session);
         break;
       case "customeridentification.success":
         console.log("identified customer:", body.data.customer_code);
@@ -51,16 +51,18 @@ export async function POST(req: NextRequest) {
         console.log("⚠️ Transfer failed:", body.data.reference);
         break;
       case "subscription.create":
-        console.log(
-          "🆕 New subscription created:",
-          body.data
-        );
+        console.log("🆕 New subscription created:", body.data);
         const subscriptionId = body.data.subscription_code;
         // Update user subscription status in your database
         break;
       case "subscription.not_renew":
-        console.log("🚫 Subscription disabled:", body.data.customer );
-        
+        console.log("🚫 Subscription not renew:", body.data);
+        const subscription = body.data;
+        await handleSubscriptionDisable(subscription);
+        break;
+      case "subscription.disable":
+        console.log("🚫 Subscription disabled:", body.data);
+
         break;
       default:
         console.log(`Unhandled event type: ${event}`);

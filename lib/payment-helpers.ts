@@ -5,7 +5,7 @@ interface PaystackChargeData {
   domain: string;
   status: string;
   reference: string;
-  amount: number; // In kobo (Nigerian currency smallest unit)
+  amount: number; 
   message: string | null;
   gateway_response: string;
   paid_at: string;
@@ -16,6 +16,19 @@ interface PaystackChargeData {
   currency: string;
   ip_address: string;
 }
+
+export async function handleSubscriptionDisable(data: any) {
+  try{
+    const subscription = data.customer
+    const sql = await getDbConnection()
+    await sql `UPDATE users SET status = 'cancelled' WHERE customer_id = ${subscription.id}`;
+  }
+  catch(err){
+    console.error("Error handling subscription disable:", err);
+    throw err
+  }
+}
+
 export async function handleChargeSuccess(data: PaystackChargeData) {
   // Example: Log the charge data
   console.log("Charge successful:", data);
