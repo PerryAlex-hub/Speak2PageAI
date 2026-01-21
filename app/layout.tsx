@@ -4,6 +4,7 @@ import Header from "../components/home/Header";
 import {cn} from "@/lib/utils";
 import "./globals.css";
 import {ClerkProvider} from "@clerk/nextjs";
+import { Toaster } from "@/components/ui/sonner";
 
 const fontSans = localFont({
   src: [
@@ -52,7 +53,8 @@ export default function RootLayout({
           )}
         >
           <Header />
-          <main> {children} </main>.
+          <main> {children} </main>
+          <Toaster/>
         </body>
       </html>
     </ClerkProvider>
