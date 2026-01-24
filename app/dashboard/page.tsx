@@ -10,6 +10,7 @@ import {
   updateUser,
 } from "@/lib/user-helpers";
 import { currentUser } from "@clerk/nextjs/server";
+import { redirect } from "next/navigation";
 
 const Dashboard = async () => {
   const clerkUser = await currentUser();
@@ -19,6 +20,10 @@ const Dashboard = async () => {
   let userId = null;
   let priceId = null;
   const hasUserCancelled = await hasCancelledSubscription(sql, email);
+  if(!clerkUser){
+    return redirect("/sign-in")
+  }
+
   if (user) {
     userId = clerkUser?.id;
     if (userId) {

@@ -5,7 +5,10 @@ import z from "zod";
 import { toast } from "sonner";
 import { useState } from "react";
 import { useUploadThing } from "@/utils/uploadthing";
-import transcribeUploadedFile from "@/actions/upload-actions";
+import {
+  transcribeUploadedFile,
+  generateBlogPostAction,
+} from "@/actions/upload-actions";
 
 const schema = z.object({
   file: z
@@ -39,7 +42,7 @@ const UploadForm = () => {
     },
     onUploadBegin: () => {
       setIsUploading(true);
-      toast.info("Upload Started");
+      toast.info("Upload Started", { position: "top-right" });
     },
   });
 
@@ -82,8 +85,29 @@ const UploadForm = () => {
       try {
         const result = await transcribeUploadedFile(resp);
         console.log({ result });
+        const { data = null, message = null } = result || {};
         if (!result?.success) {
           toast.error(result?.message ?? "Transcription failed");
+        }
+
+        if (data) {
+          toast.info("Generating blog post...", {
+            description: "Please wait while we generate your blog post.",
+            position: "top-right",
+          });
+
+          console.log({ data });
+
+          await generateBlogPostAction({
+            transcriptions: data.transcriptions,
+            userId: data.userId,
+          });
+
+          toast.success("Blog post generated successfully!", {
+            description:
+              "Your blog post has been created, Click on the post to edit it",
+            position: "top-right",
+          });
         }
       } catch (err) {
         console.error(err);
