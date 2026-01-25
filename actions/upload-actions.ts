@@ -4,7 +4,6 @@ import { Buffer } from "buffer";
 import getDbConnection from "@/lib/db";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
-import { success } from "zod";
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -58,7 +57,7 @@ export async function transcribeUploadedFile(
         headers: {
           Authorization: `Bearer ${process.env.OPENAI_API_KEY ?? ""}`,
         },
-        body: formData as any,
+        body: formData,
       },
     );
 
@@ -108,8 +107,8 @@ async function saveBlogPost(userId: string, title: string, content: string) {
 async function getLatestPosts(userId: string) {
   try {
     const sql = await getDbConnection();
-  const posts =
-    await sql`SELECT content from posts where user_id = ${userId} ORDER BY created_at DESC LIMIT 3`;
+    const posts =
+      await sql`SELECT content from posts where user_id = ${userId} ORDER BY created_at DESC LIMIT 3`;
 
     return posts.map((post) => post.content).join("\n\n");
   } catch (error) {
@@ -183,7 +182,7 @@ export async function generateBlogPostAction({
       };
     }
 
-    const [title, ...contentParts] = blogPost?.split("\n\n") || [];
+    const [title] = blogPost?.split("\n\n") || [];
 
     if (userId) {
       postId = await saveBlogPost(userId, title, blogPost);
