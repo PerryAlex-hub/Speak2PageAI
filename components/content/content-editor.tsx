@@ -3,7 +3,7 @@
 import { useActionState, useCallback, useState, useEffect } from "react";
 import BgGradient from "../common/bg-gradient";
 import { ForwardRefEditor } from "./forward-ref-editor";
-import { useFormState, useFormStatus } from "react-dom";
+import { useFormStatus } from "react-dom";
 import { updatePostAction } from "@/actions/edit-actions";
 import { Button } from "../ui/button";
 import { Download, Edit2, Loader2 } from "lucide-react";
@@ -72,6 +72,7 @@ export default function ContentEditor({
   const handleContentChange = (value: string) => {
     setContent(value);
     setIsChanged(true);
+    
   };
 
   const handleExport = useCallback(() => {

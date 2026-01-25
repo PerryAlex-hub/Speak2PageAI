@@ -1,5 +1,8 @@
-import {handleChargeSuccess, handleSubscriptionDisable} from "@/lib/payment-helpers";
-import {NextRequest, NextResponse} from "next/server";
+import {
+  handleChargeSuccess,
+  handleSubscriptionDisable,
+} from "@/lib/payment-helpers";
+import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(req: NextRequest) {
   try {
@@ -13,9 +16,9 @@ export async function POST(req: NextRequest) {
     const key = await crypto.subtle.importKey(
       "raw",
       keyData,
-      {name: "HMAC", hash: "SHA-512"},
+      { name: "HMAC", hash: "SHA-512" },
       false,
-      ["sign"]
+      ["sign"],
     );
 
     const data = encoder.encode(JSON.stringify(body));
@@ -28,7 +31,7 @@ export async function POST(req: NextRequest) {
       .join("");
 
     if (hashHex !== paystackSignature) {
-      return NextResponse.json({error: "invalid signature"}, {status: 400});
+      return NextResponse.json({ error: "invalid signature" }, { status: 400 });
     }
 
     const event = body.event;
@@ -50,11 +53,6 @@ export async function POST(req: NextRequest) {
       case "transfer.failed":
         console.log("⚠️ Transfer failed:", body.data.reference);
         break;
-      case "subscription.create":
-        console.log("🆕 New subscription created:", body.data);
-        const subscriptionId = body.data.subscription_code;
-        // Update user subscription status in your database
-        break;
       case "subscription.not_renew":
         console.log("🚫 Subscription not renew:", body.data);
         const subscription = body.data;
@@ -68,9 +66,9 @@ export async function POST(req: NextRequest) {
         console.log(`Unhandled event type: ${event}`);
     }
 
-    return NextResponse.json({received: true});
+    return NextResponse.json({ received: true });
   } catch (error) {
     console.log("Webhook Error", error);
-    return NextResponse.json({status: "Error", error});
+    return NextResponse.json({ status: "Error", error });
   }
 }

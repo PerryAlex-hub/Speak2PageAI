@@ -35,12 +35,12 @@ const Dashboard = async () => {
     await getPlanType(priceId);
 
   const isBasicPlan = planTypeId === "basic";
-  const isProPlan = planTypeId === "pro";
+  // const isProPlan = planTypeId === "pro";
   return (
     <BgGradient>
       <div className="mx-auto max-w-7xl px-6 py-24 sm:py-32 lg:px-8">
         <div className="flex flex-col items-center justify-center gap-6 text-center">
-          <Badge className="bg-gradient-to-r from-purple-700 to-pink-800 text-white px-4 py-1 text-lg font-semibold capitalize">
+          <Badge className="bg-linear-to-r from-purple-700 to-pink-800 text-white px-4 py-1 text-lg font-semibold capitalize">
             {PlanTypeName} Plan
           </Badge>
 

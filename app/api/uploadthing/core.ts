@@ -13,7 +13,7 @@ export const ourFileRouter = {
       maxFileSize: "32MB",
     },
   })
-    .middleware(async ({ req }) => {
+    .middleware(async () => {
       const user = await currentUser();
       console.log({user})
 
