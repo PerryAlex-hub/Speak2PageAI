@@ -4,10 +4,11 @@ import { currentUser } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 
 export default async function PostsPage({
-  params: { id },
+  params,
 }: {
-  params: { id: string };
+  params: { id: string } | Promise<{ id: string }>;
 }) {
+  const { id } = await params;
   const user = await currentUser();
 
   if (!user) {
@@ -21,7 +22,6 @@ export default async function PostsPage({
 
   return (
     <div className="mx-auto w-full max-w-screen-xl px-2.5 lg:px-0 mb-12 mt-28">
-
       <ContentEditor posts={posts} />
     </div>
   );

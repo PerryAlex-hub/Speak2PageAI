@@ -1,19 +1,21 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { useActionState, useCallback, useState, useEffect } from "react";
 import BgGradient from "../common/bg-gradient";
 import { ForwardRefEditor } from "./forward-ref-editor";
 import { useFormState, useFormStatus } from "react-dom";
 import { updatePostAction } from "@/actions/edit-actions";
 import { Button } from "../ui/button";
 import { Download, Edit2, Loader2 } from "lucide-react";
+import { toast } from "sonner";
 
 function SubmitButton() {
   const { pending } = useFormStatus();
+
   return (
     <Button
       type="submit"
-      className={`w-40 bg-gradient-to-r from-purple-900 to-indigo-600 hover:from-purple-600 hover:to-indigo-900 text-white font-semibold py-2 px-4 rounded-full shadow-lg transform transition duration-200 ease-in-out hover:scale-105 focus:outline-none focus:ring-2`}
+      className={`w-40 bg-linear-to-r from-purple-900 to-indigo-600 hover:from-purple-600 hover:to-indigo-900 text-white font-semibold py-2 px-4 rounded-full shadow-lg transform transition duration-200 ease-in-out hover:scale-105 focus:outline-none focus:ring-2`}
       disabled={pending}
     >
       {pending ? (
@@ -56,10 +58,16 @@ export default function ContentEditor({
     content,
   });
 
-  const [state, formAction] = useFormState<UploadState, FormData>(
+  const [state, formAction] = useActionState<UploadState, FormData>(
     updatedPostActionWithId as unknown as UploadAction,
     initialState
   );
+
+  useEffect(() => {
+    if (state?.success) {
+      toast.success("Post updated successfully!", { position: "top-right" });
+    }
+  }, [state?.success]);
 
   const handleContentChange = (value: string) => {
     setContent(value);
@@ -93,7 +101,7 @@ export default function ContentEditor({
           <SubmitButton></SubmitButton>
           <Button
             onClick={handleExport}
-            className="w-40 bg-gradient-to-r from-amber-500 to-amber-900 hover:from-amber-600 hover:to-amber-700 text-white font-semibold py-2 px-4 rounded-full shadow-lg transform transition duration-200 ease-in-out hover:scale-105 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-opacity-50"
+            className="w-40 bg-linear-to-r from-amber-500 to-amber-900 hover:from-amber-600 hover:to-amber-700 text-white font-semibold py-2 px-4 rounded-full shadow-lg transform transition duration-200 ease-in-out hover:scale-105 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-opacity-50"
           >
             <Download className="w-5 h-5 mr-2" />
             Export
