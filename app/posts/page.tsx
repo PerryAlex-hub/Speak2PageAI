@@ -15,7 +15,7 @@ const Posts = async () => {
     const sql = await getDbConnection();
     const posts = await sql`SELECT * from posts where user_id = ${user.id}`
    return (
-    <main className="mx-auto w-full max-w-screen-xl px-2.5 lg:px-0 mb-12 mt-28">
+    <main className="mx-auto w-full max-w-7xl px-2.5 lg:px-0 mb-12 mt-28">
       <h2 className="text-2xl font-semibold text-gray-800 mb-2">
         Your posts ✍️
       </h2>
