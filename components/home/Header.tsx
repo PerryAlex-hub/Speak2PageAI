@@ -33,7 +33,7 @@ export default function Header() {
   const closeMenu = () => setIsMenuOpen(false);
 
   return (
-    <nav className="container mx-auto px-4 py-4">
+    <nav className="container mx-auto px-4 sm:px-15 py-4">
       <div className="flex items-center justify-between">
         {/* Logo */}
         <div className="flex-shrink-0">

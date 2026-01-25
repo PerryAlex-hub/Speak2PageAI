@@ -15,7 +15,7 @@ function SubmitButton() {
   return (
     <Button
       type="submit"
-      className={`w-40 bg-linear-to-r from-purple-900 to-indigo-600 hover:from-purple-600 hover:to-indigo-900 text-white font-semibold py-2 px-4 rounded-full shadow-lg transform transition duration-200 ease-in-out hover:scale-105 focus:outline-none focus:ring-2`}
+      className={`w-full sm:w-40 bg-linear-to-r from-purple-900 to-indigo-600 hover:from-purple-600 hover:to-indigo-900 text-white font-semibold py-2 px-4 rounded-full shadow-lg transform transition duration-200 ease-in-out hover:scale-105 focus:outline-none focus:ring-2`}
       disabled={pending}
     >
       {pending ? (
@@ -88,18 +88,18 @@ export default function ContentEditor({
 
   return (
     <form action={formAction} className="flex flex-col gap-2">
-      <div className="flex justify-between items-center border-b-2 border-gray-200/50 pb-4">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center border-b-2 border-gray-200/50 pb-4">
         <div>
-          <h2 className="text-2xl font-bold text-gray-800 mb-2 flex items-center gap-2">
+          <h2 className="text-lg sm:text-2xl font-bold text-gray-800 mb-2 flex items-center gap-2">
             📝 Edit your post
           </h2>
           <p className="text-gray-600">Start editing your blog post below...</p>
         </div>
-        <div className="flex gap-4">
+        <div className="flex flex-col sm:flex-row gap-2 sm:gap-4 w-full sm:w-auto mt-4 sm:mt-0">
           <SubmitButton></SubmitButton>
           <Button
             onClick={handleExport}
-            className="w-40 bg-linear-to-r from-amber-500 to-amber-900 hover:from-amber-600 hover:to-amber-700 text-white font-semibold py-2 px-4 rounded-full shadow-lg transform transition duration-200 ease-in-out hover:scale-105 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-opacity-50"
+            className="w-full sm:w-40 bg-linear-to-r from-amber-500 to-amber-900 hover:from-amber-600 hover:to-amber-700 text-white font-semibold py-2 px-4 rounded-full shadow-lg transform transition duration-200 ease-in-out hover:scale-105 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-opacity-50"
           >
             <Download className="w-5 h-5 mr-2" />
             Export
