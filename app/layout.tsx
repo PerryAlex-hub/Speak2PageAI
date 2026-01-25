@@ -6,6 +6,7 @@ import "./globals.css";
 import { ClerkProvider } from "@clerk/nextjs";
 import { Toaster } from "@/components/ui/sonner";
 import { ORIGIN_URL } from "@/lib/constants";
+import { Analytics } from "@vercel/analytics/next";
 
 const fontSans = localFont({
   src: [
@@ -64,6 +65,7 @@ export default function RootLayout({
           <Header />
           <main> {children} </main>
           <Toaster />
+          <Analytics />
         </body>
       </html>
     </ClerkProvider>
