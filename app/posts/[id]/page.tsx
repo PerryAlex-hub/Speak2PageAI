@@ -17,12 +17,20 @@ export default async function PostsPage({
 
   const sql = await getDbConnection();
 
-  const posts: any =
+  const posts =
     await sql`SELECT * from posts where user_id = ${user.id} and id = ${id}`;
 
+  // normalize DB result to the shape expected by ContentEditor
+  type PostRow = { id: number; title: string | null; content: string | null };
+  const typedPosts = (posts as PostRow[]).map((p) => ({
+    id: String(p.id),
+    title: String(p.title ?? ""),
+    content: String(p.content ?? ""),
+  })) as { id: string; title: string; content: string }[];
+
   return (
-    <div className="mx-auto w-full max-w-screen-xl px-2.5 lg:px-0 mb-12 mt-28">
-      <ContentEditor posts={posts} />
+    <div className="mx-auto w-full max-w-7xl px-2.5 lg:px-0 mb-12 mt-28">
+      <ContentEditor posts={typedPosts} />
     </div>
   );
 }

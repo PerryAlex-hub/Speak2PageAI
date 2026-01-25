@@ -85,7 +85,7 @@ const UploadForm = () => {
       try {
         const result = await transcribeUploadedFile(resp);
         console.log({ result });
-        const { data = null, message = null } = result || {};
+        const { data = null } = result || {};
         if (!result?.success) {
           toast.error(result?.message ?? "Transcription failed");
         }
@@ -98,8 +98,22 @@ const UploadForm = () => {
 
           console.log({ data });
 
+          // normalize transcriptions to the expected shape: { text: string }[]
+          const normalizedTranscriptions: { text: string }[] = Array.isArray(
+            data.transcriptions,
+          )
+            ? (data.transcriptions as unknown[]).map((t: unknown) => {
+                if (typeof t === "string") return { text: t };
+                if (typeof t === "object" && t !== null && "text" in t) {
+                  const maybeText = (t as { text: unknown }).text;
+                  if (typeof maybeText === "string") return { text: maybeText };
+                }
+                return { text: String(t) };
+              })
+            : [{ text: String(data.transcriptions) }];
+
           await generateBlogPostAction({
-            transcriptions: data.transcriptions,
+            transcriptions: normalizedTranscriptions[0],
             userId: data.userId,
           });
 

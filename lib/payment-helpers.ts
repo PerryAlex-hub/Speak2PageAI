@@ -1,11 +1,12 @@
 import getDbConnection from "./db";
-import {PaystackCustomer, PaystackPlan} from "./types";
+import { PaystackCustomer, PaystackPlan } from "./types";
+type DbClient = Awaited<ReturnType<typeof getDbConnection>>;
 interface PaystackChargeData {
   id: number;
   domain: string;
   status: string;
   reference: string;
-  amount: number; 
+  amount: number;
   message: string | null;
   gateway_response: string;
   paid_at: string;
@@ -17,15 +18,14 @@ interface PaystackChargeData {
   ip_address: string;
 }
 
-export async function handleSubscriptionDisable(data: any) {
-  try{
-    const subscription = data.customer
-    const sql = await getDbConnection()
-    await sql `UPDATE users SET status = 'cancelled' WHERE customer_id = ${subscription.id}`;
-  }
-  catch(err){
+export async function handleSubscriptionDisable(data: { customer: PaystackCustomer }) {
+  try {
+    const subscription = data.customer;
+    const sql = await getDbConnection();
+    await sql`UPDATE users SET status = 'cancelled' WHERE customer_id = ${subscription.id}`;
+  } catch (err) {
     console.error("Error handling subscription disable:", err);
-    throw err
+    throw err;
   }
 }
 
@@ -46,7 +46,7 @@ export async function handleChargeSuccess(data: PaystackChargeData) {
   }
 }
 
-async function createOrUpdateUser(customer: PaystackCustomer, sql: any) {
+async function createOrUpdateUser(customer: PaystackCustomer, sql: DbClient) {
   try {
     const fullName = `${customer.first_name} ${customer.last_name}`;
     const user = await sql`SELECT * FROM users WHERE email = ${customer.email}`;
@@ -59,9 +59,9 @@ async function createOrUpdateUser(customer: PaystackCustomer, sql: any) {
 }
 
 async function updateUserSubscription(
-  sql: any,
+  sql: DbClient,
   email: string,
-  priceId?: string
+  priceId?: string,
 ) {
   try {
     await sql`UPDATE users SET price_id = ${priceId}, status = 'active' where email = ${email}`;
@@ -71,11 +71,11 @@ async function updateUserSubscription(
 }
 
 async function insertPayment(
-  sql: any,
+  sql: DbClient,
   email: string,
   priceId?: string,
   plan?: PaystackPlan,
-  status?: string
+  status?: string,
 ) {
   try {
     await sql`INSERT INTO payments (amount, status, paystack_payment_id, price_id, user_email) VALUES (${plan?.amount}, ${status}, ${plan?.id}, ${priceId}, ${email})`;

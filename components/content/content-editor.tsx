@@ -42,7 +42,7 @@ type UploadState = {
 
 type UploadAction = (
   state: UploadState,
-  formData: FormData
+  formData: FormData,
 ) => Promise<UploadState>;
 
 export default function ContentEditor({
@@ -51,7 +51,6 @@ export default function ContentEditor({
   posts: Array<{ content: string; title: string; id: string }>;
 }) {
   const [content, setContent] = useState(posts[0].content);
-  const [isChanged, setIsChanged] = useState(false);
 
   const updatedPostActionWithId = updatePostAction.bind(null, {
     postId: posts[0].id,
@@ -60,7 +59,7 @@ export default function ContentEditor({
 
   const [state, formAction] = useActionState<UploadState, FormData>(
     updatedPostActionWithId as unknown as UploadAction,
-    initialState
+    initialState,
   );
 
   useEffect(() => {
@@ -71,8 +70,6 @@ export default function ContentEditor({
 
   const handleContentChange = (value: string) => {
     setContent(value);
-    setIsChanged(true);
-    
   };
 
   const handleExport = useCallback(() => {
