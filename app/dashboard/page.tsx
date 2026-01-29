@@ -48,7 +48,7 @@ const Dashboard = async () => {
     priceId = user[0].price_id;
   }
   const { id: planTypeId = "starter", name: PlanTypeName } =
-    await getPlanType(priceId);
+    await getPlanType(priceId ?? "free");
 
   const isBasicPlan = planTypeId === "free";
   // const isProPlan = planTypeId === "pro";

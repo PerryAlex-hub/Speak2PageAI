@@ -176,18 +176,21 @@ export async function generateBlogPostAction({
       await sql`SELECT price_id FROM users WHERE user_id = ${userId}`;
     const priceId = user?.price_id ?? "free";
     if (priceId === "free") {
-      const [{ count }]: any =
-        await sql`SELECT COUNT(*)::int AS count FROM posts WHERE user_id = ${userId}`;
-      const postCount =
-        typeof count === "string" ? parseInt(count, 10) : (count ?? 0);
+      type CountResult = { count: number };
+      const [{ count }] =
+        (await sql`SELECT COUNT(*)::int AS count FROM posts WHERE user_id = ${userId}`) as CountResult[];
+      const postCount = count ?? 0;
       if (postCount >= 3) {
-        const err: any = new Error("LIMIT_EXCEEDED");
+        interface LimitExceededError extends Error {
+          code: string;
+        }
+        const err = new Error("LIMIT_EXCEEDED") as LimitExceededError;
         err.code = "LIMIT_EXCEEDED";
         throw err;
       }
     }
-  } catch (e) {
-    if ((e as any)?.code === "LIMIT_EXCEEDED") throw e;
+  } catch (e: unknown) {
+    if ((e as { code?: string })?.code === "LIMIT_EXCEEDED") throw e;
     console.error("Error checking plan limits:", e);
     // proceed — if DB is unreachable we attempt generation but this should be rare
   }
@@ -210,6 +213,13 @@ export async function generateBlogPostAction({
       postId = await saveBlogPost(userId, title, blogPost);
     }
   }
-  revalidatePath(`/posts/${postId}`);
-  redirect(`/posts/${postId}`);
+  if (postId) {
+    revalidatePath(`/posts/${postId}`);
+    redirect(`/posts/${postId}`);
+  } else {
+    return {
+      success: false,
+      message: "Failed to save blog post.",
+    };
+  }
 }

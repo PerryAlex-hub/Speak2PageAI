@@ -39,7 +39,10 @@ export async function createUser(
   return await sql`INSERT INTO users (email, full_name, user_id, status, price_id) VALUES (${email}, ${fullName}, ${userId}, 'free', 'free')`;
 }
 
-export async function getPlanType(priceId: string) {
+export async function getPlanType(priceId?: string) {
   const checkPlanType = plansMap.filter((plan) => plan.priceId === priceId);
-  return checkPlanType?.[0];
+  if (checkPlanType && checkPlanType.length > 0) return checkPlanType[0];
+  // fallback to free plan if available, otherwise first plan
+  const freePlan = plansMap.find((p) => p.id === "free") || plansMap[0];
+  return freePlan;
 }
