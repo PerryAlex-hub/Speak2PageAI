@@ -23,6 +23,16 @@ export async function doesUserExist(sql: NeonQueryFunction<false, false>, email:
   return null;
 }
 
+export async function createUser(
+  sql: NeonQueryFunction<false, false>,
+  email: string,
+  fullName: string | null,
+  userId: string | null
+) {
+  // create a free user by default with price_id 'free'
+  return await sql`INSERT INTO users (email, full_name, user_id, status, price_id) VALUES (${email}, ${fullName}, ${userId}, 'free', 'free')`;
+}
+
 export async function getPlanType(priceId: string) {
   const checkPlanType = plansMap.filter((plan) => plan.priceId === priceId);
   return checkPlanType?.[0];

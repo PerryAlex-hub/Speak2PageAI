@@ -1,24 +1,23 @@
 export const plansMap = [
   {
-    id: "basic",
-    name: "Basic",
+    id: "free",
+    name: "Free",
     description: "Get started with Speak2Page!",
-    price: "2,500",
+    price: "0",
     items: ["3 Blog Posts", "3 Transcriptions"],
-    paymentLink: "https://paystack.shop/pay/zcpwrrhqws",
-    priceId:
-      process.env.NODE_ENV === "development" ? "PLN_woyl75nsciaj5df" : "",
+    paymentLink: "",
+    priceId: "free",
   },
 
   {
     id: "pro",
     name: "Pro",
     description: "All Blog Posts, let's go!",
-    price: "10,000",
+    price: "5,000",
     items: ["Unlimited Blog Posts", "Unlimited Transcriptions"],
-    paymentLink: "https://paystack.shop/pay/9w45i57enf",
+    paymentLink: "https://paystack.shop/pay/vkewf0my5w",
     priceId:
-      process.env.NODE_ENV === "development" ? "PLN_qrho3w4qnusfq2e" : "",
+      process.env.NODE_ENV === "development" ? "PLN_qrho3w4qnusfq2e" : "PLN_dre6ehau6gnggv3",
   },
 ];
 

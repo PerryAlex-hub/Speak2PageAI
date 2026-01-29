@@ -9,6 +9,7 @@ import {
   hasCancelledSubscription,
   updateUser,
 } from "@/lib/user-helpers";
+import { ORIGIN_URL } from "@/lib/constants";
 import { currentUser } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 
@@ -23,8 +24,21 @@ const Dashboard = async () => {
   if(!clerkUser){
     return redirect("/sign-in")
   }
-
-  if (user) {
+  if (!user) {
+    const fullName = `${clerkUser?.firstName ?? ""} ${clerkUser?.lastName ?? ""}`.trim() || null;
+    // Move DB creation to backend API so dashboard doesn't perform DB work directly
+    try {
+      await fetch(`${ORIGIN_URL}/api/users/ensure`, {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ userId: clerkUser?.id, email, fullName }),
+      });
+    } catch (err) {
+      console.error("Error ensuring user via API:", err);
+    }
+    userId = clerkUser?.id;
+    priceId = "free";
+  } else {
     userId = clerkUser?.id;
     if (userId) {
       await updateUser(sql, email, userId!);
@@ -34,7 +48,7 @@ const Dashboard = async () => {
   const { id: planTypeId = "starter", name: PlanTypeName } =
     await getPlanType(priceId);
 
-  const isBasicPlan = planTypeId === "basic";
+  const isBasicPlan = planTypeId === "free";
   // const isProPlan = planTypeId === "pro";
   return (
     <BgGradient>
@@ -52,7 +66,7 @@ const Dashboard = async () => {
           </p>
 
           <p className="mt-2 text-lg leading-8 text-gray-600 max-w-2xl text-center ">
-            You get{" "}
+            You get {" "}
             <span className="font-bold text-amber-600 bg-amber-100 px-2 py-1 rounded-md">
               {isBasicPlan ? "3" : "unlimited"}
             </span>{" "}

@@ -169,6 +169,25 @@ export async function generateBlogPostAction({
 }) {
   const userPosts = (await getLatestPosts(userId)) ?? "";
   let postId = null;
+  // enforce plan limits: free users are limited to 3 posts/transcriptions
+  try {
+    const sql = await getDbConnection();
+    const [user] = await sql`SELECT price_id FROM users WHERE user_id = ${userId}`;
+    const priceId = user?.price_id ?? "free";
+    if (priceId === "free") {
+      const [{ count }]: any = await sql`SELECT COUNT(*)::int AS count FROM posts WHERE user_id = ${userId}`;
+      const postCount = typeof count === "string" ? parseInt(count, 10) : count ?? 0;
+      if (postCount >= 3) {
+        const err: any = new Error("LIMIT_EXCEEDED");
+        err.code = "LIMIT_EXCEEDED";
+        throw err;
+      }
+    }
+  } catch (e) {
+    if ((e as any)?.code === "LIMIT_EXCEEDED") throw e;
+    console.error("Error checking plan limits:", e);
+    // proceed — if DB is unreachable we attempt generation but this should be rare
+  }
   if (transcriptions) {
     const blogPost = await generateBlogPost({
       transcriptions: transcriptions.text,
