@@ -25,29 +25,12 @@ const Dashboard = async () => {
   let priceId = null;
   const hasUserCancelled = await hasCancelledSubscription(sql, email);
 
-  if (!user) {
-    const fullName =
-      `${clerkUser?.firstName ?? ""} ${clerkUser?.lastName ?? ""}`.trim() ||
-      null;
-    // Move DB creation to backend API so dashboard doesn't perform DB work directly
-    try {
-      await fetch(`/api/users/ensure`, {
-        method: "POST",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify({ userId: clerkUser?.id, email, fullName }),
-      });
-    } catch (err) {
-      console.error("Error ensuring user via API:", err);
-    }
-    userId = clerkUser?.id;
-    priceId = "free";
-  } else {
+  if (user) {
     userId = clerkUser?.id;
     if (userId) {
       await updateUser(sql, email, userId!);
     }
     priceId = user[0].price_id;
-    console.log(priceId);
   }
   const { id: planTypeId = "starter", name: PlanTypeName } =
     await getPlanType(priceId);
@@ -56,7 +39,7 @@ const Dashboard = async () => {
   const isBasicPlan = planTypeId === "free";
   userId = clerkUser?.id;
   const isUserOnFree = await getBenefitsForPlan(sql, userId, email);
-  
+
   // const isProPlan = planTypeId === "pro";
   return (
     <BgGradient>
@@ -82,7 +65,7 @@ const Dashboard = async () => {
             <span className="font-bold capitalize">{PlanTypeName} </span> Plan.
           </p>
 
-          {isUserOnFree || hasUserCancelled? (
+          {isUserOnFree || hasUserCancelled ? (
             <UpgradeYourPlan />
           ) : (
             <BgGradient>
