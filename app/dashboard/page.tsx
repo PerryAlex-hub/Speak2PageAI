@@ -5,6 +5,7 @@ import UploadForm from "@/components/upload/upload-form";
 import getDbConnection from "@/lib/db";
 import {
   doesUserExist,
+  getBenefitsForPlan,
   getPlanType,
   hasCancelledSubscription,
   updateUser,
@@ -23,6 +24,7 @@ const Dashboard = async () => {
   let userId = null;
   let priceId = null;
   const hasUserCancelled = await hasCancelledSubscription(sql, email);
+
   if (!user) {
     const fullName =
       `${clerkUser?.firstName ?? ""} ${clerkUser?.lastName ?? ""}`.trim() ||
@@ -45,11 +47,16 @@ const Dashboard = async () => {
       await updateUser(sql, email, userId!);
     }
     priceId = user[0].price_id;
+    console.log(priceId);
   }
   const { id: planTypeId = "starter", name: PlanTypeName } =
-    await getPlanType(priceId ?? "free");
+    await getPlanType(priceId);
+  console.log({ planTypeId, PlanTypeName });
 
   const isBasicPlan = planTypeId === "free";
+  userId = clerkUser?.id;
+  const isUserOnPro = await getBenefitsForPlan(sql, userId, email);
+  console.log(isUserOnPro);
   // const isProPlan = planTypeId === "pro";
   return (
     <BgGradient>
@@ -75,7 +82,7 @@ const Dashboard = async () => {
             <span className="font-bold capitalize">{PlanTypeName} </span> Plan.
           </p>
 
-          {hasUserCancelled ? (
+          {isUserOnPro ? (
             <UpgradeYourPlan />
           ) : (
             <BgGradient>

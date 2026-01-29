@@ -5,7 +5,6 @@ import { cn } from "@/lib/utils";
 import "./globals.css";
 import { ClerkProvider } from "@clerk/nextjs";
 import { Toaster } from "@/components/ui/sonner";
-import { ORIGIN_URL } from "@/lib/constants";
 import { Analytics } from "@vercel/analytics/next";
 
 const fontSans = localFont({
@@ -42,9 +41,9 @@ export const metadata: Metadata = {
   icons: {
     icon: "/icon.ico",
   },
-  metadataBase: new URL(ORIGIN_URL),
+  metadataBase: new URL("https://www.speak2page.app"),
   alternates: {
-    canonical:ORIGIN_URL,
+    canonical: "https://www.speak2page.app",
   },
 };
 

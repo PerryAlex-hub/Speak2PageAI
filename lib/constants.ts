@@ -16,14 +16,6 @@ export const plansMap = [
     price: "5,000",
     items: ["Unlimited Blog Posts", "Unlimited Transcriptions"],
     paymentLink: "https://paystack.shop/pay/vkewf0my5w",
-    priceId:
-      process.env.NODE_ENV === "development"
-        ? "PLN_qrho3w4qnusfq2e"
-        : "PLN_dre6ehau6gnggv3",
+    priceId: "PLN_dre6ehau6gnggv3"
   },
 ];
-
-export const ORIGIN_URL =
-  process.env.NODE_ENV === "development"
-    ? "http://localhost:3000"
-    : "https://www.speak2page.app";

@@ -44,5 +44,18 @@ export async function getPlanType(priceId?: string) {
   if (checkPlanType && checkPlanType.length > 0) return checkPlanType[0];
   // fallback to free plan if available, otherwise first plan
   const freePlan = plansMap.find((p) => p.id === "free") || plansMap[0];
-  return freePlan;
+  return checkPlanType.length > 0 ? checkPlanType[0] : freePlan;
+}
+
+export async function getBenefitsForPlan(
+  sql: NeonQueryFunction<false, false>,
+  userId: string,
+  email: string,
+) {
+  const posts = await sql`SELECT * FROM posts WHERE  user_id = ${userId}`;
+  const postsNumber = posts ? posts.length : 0;
+  const priceId = await sql`SELECT price_id FROM users WHERE  email = ${email}`;
+  const planType = await getPlanType(priceId[0]?.price_id);
+  const determineBenefits = postsNumber === 3 && planType.id === "free"
+  return determineBenefits;
 }
