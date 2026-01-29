@@ -55,8 +55,8 @@ const Dashboard = async () => {
 
   const isBasicPlan = planTypeId === "free";
   userId = clerkUser?.id;
-  const isUserOnPro = await getBenefitsForPlan(sql, userId, email);
-  console.log(isUserOnPro);
+  const isUserOnFree = await getBenefitsForPlan(sql, userId, email);
+  
   // const isProPlan = planTypeId === "pro";
   return (
     <BgGradient>
@@ -82,7 +82,7 @@ const Dashboard = async () => {
             <span className="font-bold capitalize">{PlanTypeName} </span> Plan.
           </p>
 
-          {isUserOnPro ? (
+          {isUserOnFree || hasUserCancelled? (
             <UpgradeYourPlan />
           ) : (
             <BgGradient>

@@ -13,7 +13,7 @@ export const plansMap = [
     id: "pro",
     name: "Pro",
     description: "All Blog Posts, let's go!",
-    price: "5,000",
+    price: "3,500",
     items: ["Unlimited Blog Posts", "Unlimited Transcriptions"],
     paymentLink: "https://paystack.shop/pay/vkewf0my5w",
     priceId: "PLN_dre6ehau6gnggv3"
