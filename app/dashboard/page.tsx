@@ -9,28 +9,27 @@ import {
   hasCancelledSubscription,
   updateUser,
 } from "@/lib/user-helpers";
-import { ORIGIN_URL } from "@/lib/constants";
 import { currentUser } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 
 const Dashboard = async () => {
   const clerkUser = await currentUser();
+  if (!clerkUser) {
+    return redirect("/sign-in");
+  }
   const email = clerkUser?.emailAddresses?.[0].emailAddress ?? "";
   const sql = await getDbConnection();
   const user = await doesUserExist(sql, email);
   let userId = null;
   let priceId = null;
   const hasUserCancelled = await hasCancelledSubscription(sql, email);
-  if (!clerkUser) {
-    return redirect("/sign-in");
-  }
   if (!user) {
     const fullName =
       `${clerkUser?.firstName ?? ""} ${clerkUser?.lastName ?? ""}`.trim() ||
       null;
     // Move DB creation to backend API so dashboard doesn't perform DB work directly
     try {
-      await fetch(`${ORIGIN_URL}/api/users/ensure`, {
+      await fetch(`/api/users/ensure`, {
         method: "POST",
         headers: { "content-type": "application/json" },
         body: JSON.stringify({ userId: clerkUser?.id, email, fullName }),
