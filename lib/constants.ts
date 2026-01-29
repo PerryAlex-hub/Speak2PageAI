@@ -17,7 +17,9 @@ export const plansMap = [
     items: ["Unlimited Blog Posts", "Unlimited Transcriptions"],
     paymentLink: "https://paystack.shop/pay/vkewf0my5w",
     priceId:
-      process.env.NODE_ENV === "development" ? "PLN_qrho3w4qnusfq2e" : "PLN_dre6ehau6gnggv3",
+      process.env.NODE_ENV === "development"
+        ? "PLN_qrho3w4qnusfq2e"
+        : "PLN_dre6ehau6gnggv3",
   },
 ];
 

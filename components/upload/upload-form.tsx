@@ -128,9 +128,12 @@ const UploadForm = () => {
         const e = err as { code?: string; message?: string };
         const code = e?.code ?? e?.message;
         if (code === "LIMIT_EXCEEDED") {
-          toast.error("You have reached the free plan limit (3 posts). Upgrade to Pro to create more.", {
-            description: "Visit the pricing page to upgrade your plan.",
-          });
+          toast.error(
+            "You have reached the free plan limit (3 posts). Upgrade to Pro to create more.",
+            {
+              description: "Visit the pricing page to upgrade your plan.",
+            },
+          );
         } else {
           toast.error("Transcription failed. Please try again.");
         }

@@ -6,7 +6,10 @@ export async function POST(req: Request) {
     const body = await req.json();
     const { userId, email, fullName } = body;
     if (!email) {
-      return NextResponse.json({ success: false, message: "Missing email" }, { status: 400 });
+      return NextResponse.json(
+        { success: false, message: "Missing email" },
+        { status: 400 },
+      );
     }
 
     const sql = await getDbConnection();
@@ -23,6 +26,9 @@ export async function POST(req: Request) {
     return NextResponse.json({ success: true, created: true });
   } catch (err) {
     console.error("/api/users/ensure error", err);
-    return NextResponse.json({ success: false, message: "Server error" }, { status: 500 });
+    return NextResponse.json(
+      { success: false, message: "Server error" },
+      { status: 500 },
+    );
   }
 }

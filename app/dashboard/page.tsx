@@ -21,11 +21,13 @@ const Dashboard = async () => {
   let userId = null;
   let priceId = null;
   const hasUserCancelled = await hasCancelledSubscription(sql, email);
-  if(!clerkUser){
-    return redirect("/sign-in")
+  if (!clerkUser) {
+    return redirect("/sign-in");
   }
   if (!user) {
-    const fullName = `${clerkUser?.firstName ?? ""} ${clerkUser?.lastName ?? ""}`.trim() || null;
+    const fullName =
+      `${clerkUser?.firstName ?? ""} ${clerkUser?.lastName ?? ""}`.trim() ||
+      null;
     // Move DB creation to backend API so dashboard doesn't perform DB work directly
     try {
       await fetch(`${ORIGIN_URL}/api/users/ensure`, {
@@ -66,7 +68,7 @@ const Dashboard = async () => {
           </p>
 
           <p className="mt-2 text-lg leading-8 text-gray-600 max-w-2xl text-center ">
-            You get {" "}
+            You get{" "}
             <span className="font-bold text-amber-600 bg-amber-100 px-2 py-1 rounded-md">
               {isBasicPlan ? "3" : "unlimited"}
             </span>{" "}

@@ -172,11 +172,14 @@ export async function generateBlogPostAction({
   // enforce plan limits: free users are limited to 3 posts/transcriptions
   try {
     const sql = await getDbConnection();
-    const [user] = await sql`SELECT price_id FROM users WHERE user_id = ${userId}`;
+    const [user] =
+      await sql`SELECT price_id FROM users WHERE user_id = ${userId}`;
     const priceId = user?.price_id ?? "free";
     if (priceId === "free") {
-      const [{ count }]: any = await sql`SELECT COUNT(*)::int AS count FROM posts WHERE user_id = ${userId}`;
-      const postCount = typeof count === "string" ? parseInt(count, 10) : count ?? 0;
+      const [{ count }]: any =
+        await sql`SELECT COUNT(*)::int AS count FROM posts WHERE user_id = ${userId}`;
+      const postCount =
+        typeof count === "string" ? parseInt(count, 10) : (count ?? 0);
       if (postCount >= 3) {
         const err: any = new Error("LIMIT_EXCEEDED");
         err.code = "LIMIT_EXCEEDED";
