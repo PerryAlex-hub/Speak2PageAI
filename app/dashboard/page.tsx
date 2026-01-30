@@ -4,6 +4,7 @@ import UpgradeYourPlan from "@/components/upload/upgrade-your-plan";
 import UploadForm from "@/components/upload/upload-form";
 import getDbConnection from "@/lib/db";
 import {
+  createUser,
   doesUserExist,
   getBenefitsForPlan,
   getPlanType,
@@ -19,6 +20,8 @@ const Dashboard = async () => {
     return redirect("/sign-in");
   }
   const email = clerkUser?.emailAddresses?.[0].emailAddress ?? "";
+  const fullName =
+    `${clerkUser?.firstName ?? ""}${clerkUser?.lastName ?? ""}`.trim();
   const sql = await getDbConnection();
   const user = await doesUserExist(sql, email);
   let userId = null;
@@ -28,9 +31,14 @@ const Dashboard = async () => {
   if (user) {
     userId = clerkUser?.id;
     if (userId) {
+      console.log(email);
+      console.log(fullName)
       await updateUser(sql, email, userId!);
     }
     priceId = user[0].price_id;
+  } else {
+    userId = clerkUser?.id;
+    await createUser(sql, email, fullName, userId);
   }
   const { id: planTypeId = "starter", name: PlanTypeName } =
     await getPlanType(priceId);
