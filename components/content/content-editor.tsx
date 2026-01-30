@@ -107,11 +107,15 @@ export default function ContentEditor({
             import("marked"),
             import("jspdf"),
           ]);
-          const markedLib =
-            (marked as any) ??
+          type MarkedType = {
+            lexer?: (src: string) => any[];
+            parse?: (src: string) => string;
+          };
+          const markedLib: MarkedType =
+            (marked as MarkedType) ??
             (typeof marked === "function" ? { parse: marked } : marked);
           const jsPDF =
-            (jsPDFModule as any).jsPDF ?? jsPDFModule.default ?? jsPDFModule;
+            (jsPDFModule as { jsPDF?: any; default?: any })?.jsPDF ?? jsPDFModule.default ?? jsPDFModule;
 
           // Parse markdown to tokens
           const tokens = (markedLib as any).lexer
