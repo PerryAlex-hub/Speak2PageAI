@@ -36,7 +36,7 @@ const UploadForm = () => {
       toast.success("Upload Completed");
     },
     onUploadError: (error: Error) => {
-      console.error(`ERROR! ${error.message}`);
+      // console.error(`ERROR! ${error.message}`);
       setIsUploading(false);
       toast.error(`Upload Error: ${error.message}`, { position: "top-right" });
     },

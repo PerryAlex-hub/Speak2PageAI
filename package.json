@@ -31,6 +31,10 @@
     "sonner": "^2.0.7",
     "tailwind-merge": "^3.3.1",
     "uploadthing": "^7.7.4",
+    "jspdf": "^2.5.1",
+    "docx": "^8.3.0",
+    "marked": "^5.1.1",
+    "html2canvas": "^1.4.1",
     "zod": "^4.3.5"
   },
   "devDependencies": {

@@ -136,18 +136,23 @@ async function generateBlogPost({
         content: `Here are some of my previous blog posts for reference:
 
 ${userPosts}
+Please convert the following transcription into a high-quality, professional blog post using Markdown formatting. Follow these instructions carefully:
 
-Please convert the following transcription into a well-structured blog post using Markdown formatting. Follow this structure:
+1. Start with a **SEO-optimized, catchy title** on the first line that sparks curiosity and encourages clicks.
+2. Add **a new line** after the title.
+3. Begin with an **engaging introduction paragraph** that hooks the reader, clearly explains the topic, and sets the tone for the article.
+4. Structure the main content into **clear sections** using Markdown headings (## for main sections, ### for subheadings).
+5. Include **bullet points, numbered lists, and tables** where appropriate to make complex ideas easy to digest.
+6. Add **examples, analogies, or mini case studies** where relevant to make the content practical and relatable.
+7. Use **transitional sentences and storytelling techniques** to maintain flow between sections.
+8. Write a **conclusion paragraph** that summarizes key points, reinforces the value, and provides a call-to-action if applicable.
+9. Maintain an **informative, authoritative, yet approachable tone** throughout. Avoid generic phrasing.
+10. **Emulate my writing style, tone, and recurring patterns** from my previous posts — maintain the same sentence rhythm, vocabulary, and energy.
+11. Ensure the content is **original, creative, and hard to distinguish from content written by a human expert**.
+12. Use **natural language, rhetorical questions, and varied sentence structures** to make the post engaging.
+13. Format all Markdown elements correctly — headings, lists, bold/italics, links, and code blocks if needed.
 
-1. Start with a SEO friendly catchy title on the first line.
-2. Add two newlines after the title.
-3. Write an engaging introduction paragraph.
-4. Create multiple sections for the main content, using appropriate headings (##, ###).
-5. Include relevant subheadings within sections if needed.
-6. Use bullet points or numbered lists where appropriate.
-7. Add a conclusion paragraph at the end.
-8. Ensure the content is informative, well-organized, and easy to read.
-9. Emulate my writing style, tone, and any recurring patterns you notice from my previous posts.
+Produce a final, polished Markdown blog post that reads like it was written by an expert content writer with deep knowledge of the subject.
 
 Here's the transcription to convert: ${transcriptions}`,
       },
