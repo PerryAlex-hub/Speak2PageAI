@@ -43,6 +43,17 @@ export async function transcribeUploadedFile(
     const arrayBuffer = await response.arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
 
+    
+    // Enforce 20MB limit server-side before attempting transcription
+    const MAX_BYTES = 20 * 1024 * 1024;
+    if (buffer.byteLength > MAX_BYTES) {
+      return {
+        success: false,
+        message: "File size exceeds the 20MB limit and cannot be transcribed.",
+        data: null,
+      };
+    }
+
     const formData = new FormData();
     // Use a Blob so filename is preserved when sending multipart/form-data
     const fileBlob = new Blob([buffer]);

@@ -61,9 +61,18 @@ const UploadForm = () => {
           "Invalid File",
         position: "top-right",
       });
+      return; // stop the process if validation fails (e.g., file > 20MB)
     }
 
     if (file) {
+      // Extra safeguard: stop if file size exceeds 20MB
+      if (file.size > 20 * 1024 * 1024) {
+        setIsUploading(false);
+        toast.error("File size must not exceed 20MB.", {
+          position: "top-right",
+        });
+        return;
+      }
       // start upload (will flip isUploading via callbacks)
       const resp = await startUpload([file]);
       console.log({ resp });
@@ -162,6 +171,10 @@ const UploadForm = () => {
           {isUploading || isTranscribing ? "Processing..." : "Transcribe"}
         </Button>
       </div>
+
+      <p className="text-sm text-gray-500">
+        Please upload a video or audio file less than or equal to 20MB.
+      </p>
     </form>
   );
 };

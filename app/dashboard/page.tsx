@@ -31,8 +31,8 @@ const Dashboard = async () => {
   if (user) {
     userId = clerkUser?.id;
     if (userId) {
-      console.log(email);
-      console.log(fullName)
+      // console.log(email);
+      // console.log(fullName)
       await updateUser(sql, email, userId!);
     }
     priceId = user[0].price_id;
@@ -42,7 +42,7 @@ const Dashboard = async () => {
   }
   const { id: planTypeId = "starter", name: PlanTypeName } =
     await getPlanType(priceId);
-  console.log({ planTypeId, PlanTypeName });
+  // console.log({ planTypeId, PlanTypeName });
 
   const isBasicPlan = planTypeId === "free";
   userId = clerkUser?.id;
