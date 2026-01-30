@@ -3,7 +3,7 @@ import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server';
 const isPublicRoute = createRouteMatcher(['/sign-in(.*)', '/', '/sign-up(.*)', '/api/payments(.*)'])
 
 export default clerkMiddleware((auth, request) => {
-    if(!isPublicRoute(request)){
+    if(!isPublicRoute(request) && !request.headers.get('user-agent')?.includes('Googlebot')){
         auth.protect()
     }
 });
