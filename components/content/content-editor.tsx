@@ -45,6 +45,44 @@ type UploadAction = (
   formData: FormData,
 ) => Promise<UploadState>;
 
+// Type definitions for markdown tokens
+interface MarkdownToken {
+  type: string;
+  text?: string;
+  depth?: number;
+  items?: Array<{ text: string }>;
+}
+
+interface MarkedLib {
+  lexer: (src: string) => MarkdownToken[];
+  parse?: (src: string) => string;
+}
+
+// Type definitions for jsPDF
+interface JsPDFInstance {
+  internal: {
+    pageSize: {
+      getWidth: () => number;
+      getHeight: () => number;
+    };
+  };
+  setFont: (font: string, style: string) => void;
+  setFontSize: (size: number) => void;
+  splitTextToSize: (text: string, maxWidth: number) => string[];
+  text: (text: string, x: number, y: number) => void;
+  addPage: () => void;
+  output: (type: string) => Blob;
+}
+
+interface JsPDFConstructor {
+  new (options: { unit: string; format: string }): JsPDFInstance;
+}
+
+interface JsPDFModule {
+  jsPDF?: JsPDFConstructor;
+  default?: JsPDFConstructor;
+}
+
 export default function ContentEditor({
   posts,
 }: {
@@ -107,22 +145,23 @@ export default function ContentEditor({
             import("marked"),
             import("jspdf"),
           ]);
-          type MarkedType = {
-            lexer?: (src: string) => any[];
-            parse?: (src: string) => string;
-          };
-          const markedLib: MarkedType =
-            (marked as MarkedType) ??
-            (typeof marked === "function" ? { parse: marked } : marked);
-          const jsPDF =
-            (jsPDFModule as { jsPDF?: any; default?: any })?.jsPDF ?? jsPDFModule.default ?? jsPDFModule;
+
+          const markedLib = marked as unknown as MarkedLib;
+          const JsPDFConstructor =
+            (jsPDFModule as JsPDFModule)?.jsPDF ??
+            (jsPDFModule as JsPDFModule & { default?: JsPDFConstructor })
+              .default ??
+            jsPDFModule;
 
           // Parse markdown to tokens
-          const tokens = (markedLib as any).lexer
-            ? (markedLib as any).lexer(content || "")
+          const tokens = markedLib.lexer
+            ? markedLib.lexer(content || "")
             : [{ type: "paragraph", text: content }];
 
-          const doc = new (jsPDF as any)({ unit: "pt", format: "a4" });
+          const doc = new (JsPDFConstructor as JsPDFConstructor)({
+            unit: "pt",
+            format: "a4",
+          });
           const pageWidth = doc.internal.pageSize.getWidth();
           const pageHeight = doc.internal.pageSize.getHeight();
           const margin = 40;
@@ -165,16 +204,17 @@ export default function ContentEditor({
             } else if (t.type === "paragraph") {
               addText(String(t.text), 12);
             } else if (t.type === "list") {
-              for (const item of t.items) {
-                addText(`• ${String(item.text)}`, 12);
+              if (t.items) {
+                for (const item of t.items) {
+                  addText(`• ${String(item.text)}`, 12);
+                }
               }
             } else if (t.type === "code") {
               addText(String(t.text), 10, "courier");
             } else if (t.type === "blockquote") {
               addText(String(t.text), 12, "helvetica", "italic");
             } else {
-              if (typeof (t as any).text === "string")
-                addText(String((t as any).text), 12);
+              if (typeof t.text === "string") addText(String(t.text), 12);
             }
           }
 
@@ -197,32 +237,36 @@ export default function ContentEditor({
           const { Document, Packer, Paragraph, TextRun, HeadingLevel } =
             docxModule;
 
-          const tokens = (marked as any).lexer(content || "") as any[];
-          const children: any[] = [];
+          const markedLib = marked as unknown as MarkedLib;
+          const tokens = markedLib.lexer(content || "");
+          const children: InstanceType<typeof Paragraph>[] = [];
 
           for (const t of tokens) {
             if (t.type === "heading") {
-              const level = Math.min(Math.max(t.depth, 1), 6);
-              let heading: any = HeadingLevel.HEADING_1;
+              const level = Math.min(Math.max(t.depth ?? 1, 1), 6);
+              let heading: (typeof HeadingLevel)[keyof typeof HeadingLevel] =
+                HeadingLevel.HEADING_1;
               if (level === 1) heading = HeadingLevel.HEADING_1;
               else if (level === 2) heading = HeadingLevel.HEADING_2;
               else if (level === 3) heading = HeadingLevel.HEADING_3;
               else heading = HeadingLevel.HEADING_3;
-              children.push(new Paragraph({ text: t.text, heading }));
+              children.push(new Paragraph({ text: t.text ?? "", heading }));
             } else if (t.type === "paragraph") {
               children.push(
                 new Paragraph({
-                  children: [new TextRun(t.text as string)],
-                } as any) as any,
+                  children: [new TextRun(t.text ?? "")],
+                }),
               );
             } else if (t.type === "list") {
-              for (const item of t.items) {
-                children.push(
-                  new Paragraph({
-                    children: [new TextRun(String(item.text))],
-                    bullet: { level: 0 } as any,
-                  } as any) as any,
-                );
+              if (t.items) {
+                for (const item of t.items) {
+                  children.push(
+                    new Paragraph({
+                      children: [new TextRun(String(item.text))],
+                      bullet: { level: 0 },
+                    }),
+                  );
+                }
               }
             } else if (t.type === "code") {
               children.push(
@@ -230,21 +274,21 @@ export default function ContentEditor({
                   children: [
                     new TextRun({ text: String(t.text), font: "Courier New" }),
                   ],
-                } as any) as any,
+                }),
               );
             } else if (t.type === "blockquote") {
               children.push(
                 new Paragraph({
                   children: [new TextRun(String(t.text))],
-                } as any) as any,
+                }),
               );
             } else {
               // fallback: render raw text
-              if (typeof (t as any).text === "string")
+              if (typeof t.text === "string")
                 children.push(
                   new Paragraph({
-                    children: [new TextRun((t as any).text)],
-                  } as any) as any,
+                    children: [new TextRun(t.text)],
+                  }),
                 );
             }
           }
@@ -262,7 +306,7 @@ export default function ContentEditor({
         }
       }
     })();
-  }, [content, posts]);
+  }, [content, posts, exportFormat]);
 
   return (
     <form action={formAction} className="flex flex-col gap-2">
@@ -279,7 +323,9 @@ export default function ContentEditor({
             <label className="text-sm text-gray-600 mr-2">Format:</label>
             <select
               value={exportFormat}
-              onChange={(e) => setExportFormat(e.target.value as any)}
+              onChange={(e) =>
+                setExportFormat(e.target.value as "markdown" | "pdf" | "docx")
+              }
               className="px-3 py-2 rounded-md border"
             >
               <option value="markdown">Markdown (.md)</option>
@@ -289,6 +335,7 @@ export default function ContentEditor({
           </div>
 
           <Button
+            type="button"
             onClick={handleExport}
             className="w-full sm:w-40 bg-linear-to-r from-amber-500 to-amber-900 hover:from-amber-600 hover:to-amber-700 text-white font-semibold py-2 px-4 rounded-full shadow-lg transform transition duration-200 ease-in-out hover:scale-105 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-opacity-50"
           >
