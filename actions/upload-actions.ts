@@ -43,7 +43,6 @@ export async function transcribeUploadedFile(
     const arrayBuffer = await response.arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
 
-    
     // Enforce 20MB limit server-side before attempting transcription
     const MAX_BYTES = 20 * 1024 * 1024;
     if (buffer.byteLength > MAX_BYTES) {
@@ -132,28 +131,38 @@ async function getLatestPosts(userId: string) {
 const WRITING_STYLES = [
   {
     name: "storyteller",
-    description: "Open with a personal anecdote or vivid scene. Write like you're telling a friend about something fascinating you discovered. Use 'I', share doubts, include moments of realization.",
-    hookStyle: "Start with a surprising personal moment or a 'I never expected...' opener",
+    description:
+      "Open with a personal anecdote or vivid scene. Write like you're telling a friend about something fascinating you discovered. Use 'I', share doubts, include moments of realization.",
+    hookStyle:
+      "Start with a surprising personal moment or a 'I never expected...' opener",
   },
   {
     name: "provocateur",
-    description: "Challenge conventional wisdom. Start with a controversial take. Use rhetorical questions that make readers stop scrolling. Be bold but back it up.",
-    hookStyle: "Open with 'Everything you know about X is wrong' or 'Here's what nobody tells you about...'",
+    description:
+      "Challenge conventional wisdom. Start with a controversial take. Use rhetorical questions that make readers stop scrolling. Be bold but back it up.",
+    hookStyle:
+      "Open with 'Everything you know about X is wrong' or 'Here's what nobody tells you about...'",
   },
   {
     name: "curator",
-    description: "Position yourself as someone who's done the research. Share insights like you're letting readers in on secrets. Use phrases like 'After talking to 50 experts...' or 'I spent 3 months researching...'",
-    hookStyle: "Start with 'I spent X hours/days/weeks so you don't have to' or a surprising stat",
+    description:
+      "Position yourself as someone who's done the research. Share insights like you're letting readers in on secrets. Use phrases like 'After talking to 50 experts...' or 'I spent 3 months researching...'",
+    hookStyle:
+      "Start with 'I spent X hours/days/weeks so you don't have to' or a surprising stat",
   },
   {
     name: "conversationalist",
-    description: "Write like a casual coffee chat. Short paragraphs. Incomplete sentences sometimes. Ask questions. React to your own points ('Wild, right?'). Use parentheticals for asides.",
-    hookStyle: "Open with a question that hits close to home or 'Can we talk about...'",
+    description:
+      "Write like a casual coffee chat. Short paragraphs. Incomplete sentences sometimes. Ask questions. React to your own points ('Wild, right?'). Use parentheticals for asides.",
+    hookStyle:
+      "Open with a question that hits close to home or 'Can we talk about...'",
   },
   {
     name: "analyst",
-    description: "Break things down methodically but keep it engaging. Use frameworks and mental models. Include 'Here's the thing most people miss...' moments.",
-    hookStyle: "Start with a pattern you've noticed or 'There's a hidden framework behind...'",
+    description:
+      "Break things down methodically but keep it engaging. Use frameworks and mental models. Include 'Here's the thing most people miss...' moments.",
+    hookStyle:
+      "Start with a pattern you've noticed or 'There's a hidden framework behind...'",
   },
 ];
 
@@ -188,7 +197,7 @@ async function generateBlogPost({
 }) {
   const style = getRandomStyle();
   const titleFormulas = getRandomTitleFormulas();
-  
+
   const systemPrompt = `You are a viral content writer who creates posts that dominate Medium, Substack, and LinkedIn. Your content feels deeply human, personal, and impossible to detect as AI-written.
 
 CRITICAL ANTI-AI-DETECTION RULES:
