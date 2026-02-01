@@ -1,5 +1,6 @@
 "use server";
 import OpenAI from "openai";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 import { Buffer } from "buffer";
 import getDbConnection from "@/lib/db";
 import { redirect } from "next/navigation";
@@ -8,6 +9,8 @@ import { revalidatePath } from "next/cache";
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
+
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY ?? "");
 
 export async function transcribeUploadedFile(
   resp: {
@@ -127,65 +130,39 @@ async function getLatestPosts(userId: string) {
   }
 }
 
-// Writing style templates for variety - each post gets a random style
-const WRITING_STYLES = [
+// Content approach templates for adapting to different transcript types
+const CONTENT_APPROACHES = [
   {
-    name: "storyteller",
+    name: "educational",
     description:
-      "Open with a personal anecdote or vivid scene. Write like you're telling a friend about something fascinating you discovered. Use 'I', share doubts, include moments of realization.",
-    hookStyle:
-      "Start with a surprising personal moment or a 'I never expected...' opener",
+      "If the transcript is teaching something, explain it with crystal clarity. Break down complex ideas into digestible pieces. Use examples that click instantly. Make the reader feel smarter after every paragraph.",
   },
   {
-    name: "provocateur",
+    name: "informative",
     description:
-      "Challenge conventional wisdom. Start with a controversial take. Use rhetorical questions that make readers stop scrolling. Be bold but back it up.",
-    hookStyle:
-      "Open with 'Everything you know about X is wrong' or 'Here's what nobody tells you about...'",
+      "If the transcript shares information or news, present it compellingly. Highlight what matters most. Connect the dots for readers. Give them the 'so what' and 'why should I care' upfront.",
   },
   {
-    name: "curator",
+    name: "persuasive",
     description:
-      "Position yourself as someone who's done the research. Share insights like you're letting readers in on secrets. Use phrases like 'After talking to 50 experts...' or 'I spent 3 months researching...'",
-    hookStyle:
-      "Start with 'I spent X hours/days/weeks so you don't have to' or a surprising stat",
+      "If the transcript makes an argument or shares an opinion, present it convincingly. Build your case logically. Anticipate objections. Leave readers nodding along.",
   },
   {
-    name: "conversationalist",
+    name: "howto",
     description:
-      "Write like a casual coffee chat. Short paragraphs. Incomplete sentences sometimes. Ask questions. React to your own points ('Wild, right?'). Use parentheticals for asides.",
-    hookStyle:
-      "Open with a question that hits close to home or 'Can we talk about...'",
+      "If the transcript explains how to do something, make every step actionable. Be specific. Include the details that actually matter. Help readers succeed on their first try.",
   },
   {
-    name: "analyst",
+    name: "insightful",
     description:
-      "Break things down methodically but keep it engaging. Use frameworks and mental models. Include 'Here's the thing most people miss...' moments.",
-    hookStyle:
-      "Start with a pattern you've noticed or 'There's a hidden framework behind...'",
+      "If the transcript shares observations or analysis, draw out the deeper meaning. Connect ideas in ways readers haven't considered. Make them see familiar things differently.",
   },
 ];
 
-// Title formulas that work on Medium/Substack
-const TITLE_FORMULAS = [
-  "The [Unexpected Adjective] Truth About [Topic] That Changed How I [Action]",
-  "I [Did Something] for [Time Period]. Here's What Actually Happened.",
-  "Stop [Common Behavior]. Do This Instead.",
-  "What [Unexpected Source] Taught Me About [Topic]",
-  "[Number] [Topic] Lessons I Learned the Hard Way",
-  "The [Topic] Mistake That Cost Me [Something Valuable]",
-  "Why [Contrarian Take] (And What to Do About It)",
-  "How [Simple Thing] Became My Secret Weapon for [Outcome]",
-];
-
-function getRandomStyle() {
-  return WRITING_STYLES[Math.floor(Math.random() * WRITING_STYLES.length)];
-}
-
-function getRandomTitleFormulas() {
-  // Return 3 random formulas for inspiration
-  const shuffled = [...TITLE_FORMULAS].sort(() => 0.5 - Math.random());
-  return shuffled.slice(0, 3).join("\n- ");
+function getRandomApproach() {
+  return CONTENT_APPROACHES[
+    Math.floor(Math.random() * CONTENT_APPROACHES.length)
+  ];
 }
 
 async function generateBlogPost({
@@ -195,86 +172,118 @@ async function generateBlogPost({
   transcriptions: string;
   userPosts: string;
 }) {
-  const style = getRandomStyle();
-  const titleFormulas = getRandomTitleFormulas();
+  const approach = getRandomApproach();
 
-  const systemPrompt = `You are a viral content writer who creates posts that dominate Medium, Substack, and LinkedIn. Your content feels deeply human, personal, and impossible to detect as AI-written.
+  const systemPrompt = `You are the most accomplished content writer alive. With 50+ years in the craft, your blog posts have been read by millions. Publications fight for your byline. Your secret? You write like you talk to a brilliant friend over coffee: clear, engaging, and impossible to put down.
 
-CRITICAL ANTI-AI-DETECTION RULES:
-- Write like you're a real person with real experiences, doubts, and opinions
-- Use contractions naturally (don't, won't, I've, we're, it's)
-- Include imperfect phrasing - not every sentence needs to be grammatically perfect
-- Vary sentence length dramatically: Some short. Others should flow longer with multiple clauses that meander a bit before reaching their point.
-- Add personal interjections: "honestly", "look", "here's the thing", "I'll be real"
-- Include self-corrections: "Actually, let me rephrase that..." or "Well, sort of."
-- NEVER use em dashes (—), en dashes (–), double hyphens (--), or standalone hyphens surrounded by spaces ( - ). Use commas, periods, or parentheses instead. Only use hyphens in compound words like "well-known" or "real-time".
-- Reference specific (but generic) details: "last Tuesday", "my friend Sarah", "this one coffee shop I go to"
-- Express uncertainty sometimes: "I think", "I'm not 100% sure but", "from what I've seen"
-- Break the fourth wall occasionally: "stay with me here", "I know that sounds crazy"
-- NEVER use these AI-giveaway phrases: "In today's world", "It's important to note", "In conclusion", "Let's dive in", "Without further ado", "In this article", "Firstly/Secondly/Lastly", "game-changer", "dive deep", "landscape", "paradigm", "leverage"
-- Avoid starting sentences with "This" too often
-- Don't use colons (:) to introduce lists mid-sentence. Just use commas or write it naturally.
+WHO YOU ARE:
+You've written for every major publication. You've seen trends come and go. You know what works because you've tested everything. Your content doesn't just inform; it transforms how people think.
 
-YOUR WRITING STYLE FOR THIS POST: ${style.name}
-${style.description}
+YOUR WRITING DNA:
+• Every paragraph earns its place. If it doesn't move the reader forward, it's gone.
+• You write tight. No fluff. No filler. Just value.
+• Your rhythm is musical. Short punches. Then longer thoughts that let ideas breathe before landing with impact.
+• You use specifics, never generalities. Concrete examples. Vivid details.
 
-HOOK APPROACH: ${style.hookStyle}`;
+READER ENGAGEMENT TECHNIQUE (USE THIS):
+You engage readers by anticipating questions they might be thinking and then answering them. This makes your writing feel like a conversation. Use this technique 2 to 3 times per post in different sections.
 
-  const userPrompt = `${userPosts ? `Here's how I usually write (match my voice and energy, not the structure):\n\n${userPosts}\n\n---\n\n` : ""}Convert this transcription into a blog post that could go viral on Medium or Substack.
+Examples of how to do this:
+• "So why does this matter? Because when you understand X, you can finally Y."
+• "But wait, doesn't that contradict Z? Not exactly. Here's the nuance..."
+• "You might be wondering how this applies to you. The answer is simpler than you'd think."
+
+This technique keeps readers hooked because they feel like you're reading their mind. But space these out naturally throughout the post. Don't cluster them together.
+
+CONTENT APPROACH: ${approach.name}
+${approach.description}
+
+UNBREAKABLE RULES:
+1. ZERO DASHES. Never use em dashes (—), en dashes (–), double hyphens (--), or spaced hyphens ( - ). Restructure sentences using commas, periods, semicolons, or parentheses. Only use hyphens in compound words like "well-known" or "high-quality".
+2. NO FABRICATION. Everything must come from the transcript. Don't invent stories, anecdotes, or experiences.
+3. NATURAL LANGUAGE. Use contractions (don't, won't, I've, we're, it's). Write how humans speak.
+4. BANNED FOREVER: "In today's world", "It's important to note", "In conclusion", "Let's dive in", "Without further ado", "In this article", "Firstly/Secondly/Lastly", "game-changer", "dive deep", "landscape", "paradigm", "leverage", "at the end of the day", "it goes without saying", "needless to say", "crucial", "vital", "essential" (filler), "here's the thing", "here's the deal".
+
+LENGTH:
+Your posts are focused and punchy. Target 700 to 1,000 words. Long enough to deliver real value, short enough to respect the reader's time. Every sentence must earn its place.`;
+
+  const userPrompt = `${userPosts ? `MATCH THIS WRITING VOICE (my previous posts for reference):\n\n${userPosts}\n\n---\n\n` : ""}TRANSFORM THIS TRANSCRIPTION INTO A FOCUSED, HIGH-VALUE BLOG POST.
+
+TARGET LENGTH: 700 to 1,000 words. Punchy, valuable, no padding. Get in, deliver value, get out. Readers should finish feeling smarter, not exhausted.
 
 TITLE REQUIREMENTS:
-- Must stop the scroll. Make it impossible to NOT click.
-- Use one of these proven formulas as inspiration (adapt, don't copy):
-- ${titleFormulas}
-- Keep it under 60 characters if possible
-- No clickbait that doesn't deliver - the content must match the promise
+• Magnetic and specific. Clear value.
+• Under 70 characters.
+• Makes someone stop scrolling immediately.
 
-HOOK/OPENING (First 2-3 sentences):
-- This is the most important part. 90% of readers decide to stay or leave here.
-- Start in the middle of action, with a bold claim, or a pattern interrupt
-- NO throat-clearing. NO "Have you ever wondered..." NO generic setups.
-- Make readers feel like they've been thinking about this exact thing
+OPENING:
+• First sentence hooks instantly. Bold claim, surprising insight, or pattern interrupt.
+• NO warm-up. NO "Have you ever wondered..." Just start strong.
+• Pull readers in within three sentences.
 
 STRUCTURE:
-- Use subheadings that are themselves interesting (not just "Introduction", "Point 1")
-- Each section should have a mini-hook
-- Include at least one unexpected insight or counterintuitive point
-- Add a "quotable" line that readers would want to highlight/share
-- End with something that lingers - a question, a challenge, or a perspective shift
+• 3 to 5 compelling subheadings (## level) that are interesting, not boring labels
+• Each section: 100 to 200 words, tight and focused
+• Smooth transitions between sections
 
-FORMATTING FOR READABILITY:
-- Short paragraphs (2-4 sentences max)
-- Strategic bold for key phrases readers might skim for
-- Use > blockquotes for memorable lines or key takeaways
-- Lists only when they genuinely help, not as filler
+BODY:
+• Develop ideas from the transcript, don't just list them.
+• Explain the "why" behind the "what".
+• Use concrete examples and specifics.
+• **Bold key phrases** for skimmers.
+• Use > blockquotes sparingly for truly powerful lines.
+• IMPORTANT: Use the question-and-answer engagement technique 6 to 8 times throughout the post. Anticipate what readers might be thinking or wondering, pose that question, then answer it. Example: "So what makes this different? It comes down to..." This keeps readers engaged and makes the writing feel conversational.
 
-VOICE:
-- Write like a smart friend explaining something over drinks
-- Be specific and concrete, not abstract and generic
-- Include your genuine reaction to the ideas ("this blew my mind", "I was skeptical at first")
-- Don't over-explain. Trust the reader's intelligence.
+CLOSING:
+• Don't summarize. Leave readers with a thought that lingers or an action to take.
+• Short and punchy. 2 to 3 sentences max.
+
+FORMATTING:
+• Short paragraphs: 2 to 3 sentences.
+• Varied sentence lengths. Some short. Some flowing.
+• White space is your friend.
 
 OUTPUT FORMAT:
-- Start with the title (# heading)
-- Then a blank line
-- Then dive straight into the hook - no meta-commentary about what you're going to write
+# [Title]
 
-Here's the transcription to transform:
+[Hook immediately. No meta-commentary.]
+
+[Focused, valuable content...]
+
+TRANSCRIPTION:
 ${transcriptions}`;
 
-  const completion = await openai.chat.completions.create({
-    messages: [
-      { role: "system", content: systemPrompt },
-      { role: "user", content: userPrompt },
-    ],
-    model: "gpt-4o-mini",
-    temperature: 0.9, // Higher temperature for more creative, varied output
-    max_tokens: 2000, // More tokens for richer content
-    presence_penalty: 0.6, // Encourages more diverse vocabulary
-    frequency_penalty: 0.4, // Reduces repetitive phrases
+  const model = genAI.getGenerativeModel({
+    model: "gemini-2.5-flash",
+    generationConfig: {
+      temperature: 1,
+      topP: 0.95,
+      topK: 64,
+      maxOutputTokens: 4096,
+    },
   });
 
-  return completion.choices[0].message.content;
+  const chat = model.startChat({
+    history: [
+      {
+        role: "user",
+        parts: [{ text: systemPrompt }],
+      },
+      {
+        role: "model",
+        parts: [
+          {
+            text: "Got it. I'll write focused blog posts between 700 and 1,000 words. No dashes of any kind. I'll actively use the question-and-answer engagement technique 2 to 3 times per post, where I anticipate what readers might be wondering, pose that question, and answer it. This keeps the writing conversational and engaging. Magnetic titles, immediate hooks, real value. Ready for the transcription.",
+          },
+        ],
+      },
+    ],
+  });
+
+  const result = await chat.sendMessage(userPrompt);
+  const response = result.response;
+
+  return response.text();
 }
 
 export async function generateBlogPostAction({

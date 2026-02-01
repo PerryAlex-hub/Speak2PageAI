@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@clerk/nextjs": "^6.33.4",
+    "@google/generative-ai": "^0.24.1",
     "@mdxeditor/editor": "^3.52.3",
     "@neondatabase/serverless": "^1.0.2",
     "@radix-ui/react-label": "^2.1.8",
