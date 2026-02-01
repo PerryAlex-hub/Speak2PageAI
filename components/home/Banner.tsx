@@ -8,7 +8,7 @@ const Banner = () => {
       <h1 className="py-6 text-center">
         Turn your words into{" "}
         <span className="underline underline-offset-8 decoration-dashed decoration-purple-200">
-          captiavating
+          captivating
         </span>{" "}
         blog posts
       </h1>
@@ -20,7 +20,7 @@ const Banner = () => {
         variant={"link"}
         className="mt-6 text-xl rounded-full px-12 py-8 lg:mt-20 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-indigo-600 hover:to-purple-600 text-white font-bold shadow-lg hover:no-underline"
       >
-        <Link href="/#pricing" className="flex gap-2 items-center">
+        <Link href="/sign-in" className="flex gap-2 items-center">
           <span className="relative">Get Speak2Page</span>
           <ArrowRight className="animate-pulse" />
         </Link>

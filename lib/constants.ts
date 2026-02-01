@@ -5,7 +5,7 @@ export const plansMap = [
     description: "Get started with Speak2Page!",
     price: "0",
     items: ["3 Blog Posts", "3 Transcriptions"],
-    paymentLink: "",
+    paymentLink: "/sign-in",
     priceId: "free",
   },
 
