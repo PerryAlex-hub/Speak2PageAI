@@ -16,6 +16,6 @@ export const plansMap = [
     price: "3,500",
     items: ["Unlimited Blog Posts", "Unlimited Transcriptions"],
     paymentLink: "https://paystack.shop/pay/vkewf0my5w",
-    priceId: "PLN_dre6ehau6gnggv3"
+    priceId: "PLN_dre6ehau6gnggv3",
   },
 ];
