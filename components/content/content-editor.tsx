@@ -92,6 +92,11 @@ export default function ContentEditor({
   const [exportFormat, setExportFormat] = useState<"markdown" | "pdf" | "docx">(
     "markdown",
   );
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   const updatedPostActionWithId = updatePostAction.bind(null, {
     postId: posts[0].id,
@@ -110,6 +115,7 @@ export default function ContentEditor({
   }, [state?.success]);
 
   const handleContentChange = (value: string) => {
+    if (!isMounted) return;
     setContent(value);
   };
 

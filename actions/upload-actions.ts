@@ -128,6 +128,57 @@ async function getLatestPosts(userId: string) {
   }
 }
 
+// Writing style templates for variety - each post gets a random style
+const WRITING_STYLES = [
+  {
+    name: "storyteller",
+    description: "Open with a personal anecdote or vivid scene. Write like you're telling a friend about something fascinating you discovered. Use 'I', share doubts, include moments of realization.",
+    hookStyle: "Start with a surprising personal moment or a 'I never expected...' opener",
+  },
+  {
+    name: "provocateur",
+    description: "Challenge conventional wisdom. Start with a controversial take. Use rhetorical questions that make readers stop scrolling. Be bold but back it up.",
+    hookStyle: "Open with 'Everything you know about X is wrong' or 'Here's what nobody tells you about...'",
+  },
+  {
+    name: "curator",
+    description: "Position yourself as someone who's done the research. Share insights like you're letting readers in on secrets. Use phrases like 'After talking to 50 experts...' or 'I spent 3 months researching...'",
+    hookStyle: "Start with 'I spent X hours/days/weeks so you don't have to' or a surprising stat",
+  },
+  {
+    name: "conversationalist",
+    description: "Write like a casual coffee chat. Short paragraphs. Incomplete sentences sometimes. Ask questions. React to your own points ('Wild, right?'). Use parentheticals for asides.",
+    hookStyle: "Open with a question that hits close to home or 'Can we talk about...'",
+  },
+  {
+    name: "analyst",
+    description: "Break things down methodically but keep it engaging. Use frameworks and mental models. Include 'Here's the thing most people miss...' moments.",
+    hookStyle: "Start with a pattern you've noticed or 'There's a hidden framework behind...'",
+  },
+];
+
+// Title formulas that work on Medium/Substack
+const TITLE_FORMULAS = [
+  "The [Unexpected Adjective] Truth About [Topic] That Changed How I [Action]",
+  "I [Did Something] for [Time Period]. Here's What Actually Happened.",
+  "Stop [Common Behavior]. Do This Instead.",
+  "What [Unexpected Source] Taught Me About [Topic]",
+  "[Number] [Topic] Lessons I Learned the Hard Way",
+  "The [Topic] Mistake That Cost Me [Something Valuable]",
+  "Why [Contrarian Take] (And What to Do About It)",
+  "How [Simple Thing] Became My Secret Weapon for [Outcome]",
+];
+
+function getRandomStyle() {
+  return WRITING_STYLES[Math.floor(Math.random() * WRITING_STYLES.length)];
+}
+
+function getRandomTitleFormulas() {
+  // Return 3 random formulas for inspiration
+  const shuffled = [...TITLE_FORMULAS].sort(() => 0.5 - Math.random());
+  return shuffled.slice(0, 3).join("\n- ");
+}
+
 async function generateBlogPost({
   transcriptions,
   userPosts,
@@ -135,42 +186,83 @@ async function generateBlogPost({
   transcriptions: string;
   userPosts: string;
 }) {
+  const style = getRandomStyle();
+  const titleFormulas = getRandomTitleFormulas();
+  
+  const systemPrompt = `You are a viral content writer who creates posts that dominate Medium, Substack, and LinkedIn. Your content feels deeply human, personal, and impossible to detect as AI-written.
+
+CRITICAL ANTI-AI-DETECTION RULES:
+- Write like you're a real person with real experiences, doubts, and opinions
+- Use contractions naturally (don't, won't, I've, we're, it's)
+- Include imperfect phrasing - not every sentence needs to be grammatically perfect
+- Vary sentence length dramatically: Some short. Others should flow longer with multiple clauses that meander a bit before reaching their point.
+- Add personal interjections: "honestly", "look", "here's the thing", "I'll be real"
+- Include self-corrections: "Actually, let me rephrase that..." or "Well, sort of."
+- NEVER use em dashes (—), en dashes (–), double hyphens (--), or standalone hyphens surrounded by spaces ( - ). Use commas, periods, or parentheses instead. Only use hyphens in compound words like "well-known" or "real-time".
+- Reference specific (but generic) details: "last Tuesday", "my friend Sarah", "this one coffee shop I go to"
+- Express uncertainty sometimes: "I think", "I'm not 100% sure but", "from what I've seen"
+- Break the fourth wall occasionally: "stay with me here", "I know that sounds crazy"
+- NEVER use these AI-giveaway phrases: "In today's world", "It's important to note", "In conclusion", "Let's dive in", "Without further ado", "In this article", "Firstly/Secondly/Lastly", "game-changer", "dive deep", "landscape", "paradigm", "leverage"
+- Avoid starting sentences with "This" too often
+- Don't use colons (:) to introduce lists mid-sentence. Just use commas or write it naturally.
+
+YOUR WRITING STYLE FOR THIS POST: ${style.name}
+${style.description}
+
+HOOK APPROACH: ${style.hookStyle}`;
+
+  const userPrompt = `${userPosts ? `Here's how I usually write (match my voice and energy, not the structure):\n\n${userPosts}\n\n---\n\n` : ""}Convert this transcription into a blog post that could go viral on Medium or Substack.
+
+TITLE REQUIREMENTS:
+- Must stop the scroll. Make it impossible to NOT click.
+- Use one of these proven formulas as inspiration (adapt, don't copy):
+- ${titleFormulas}
+- Keep it under 60 characters if possible
+- No clickbait that doesn't deliver - the content must match the promise
+
+HOOK/OPENING (First 2-3 sentences):
+- This is the most important part. 90% of readers decide to stay or leave here.
+- Start in the middle of action, with a bold claim, or a pattern interrupt
+- NO throat-clearing. NO "Have you ever wondered..." NO generic setups.
+- Make readers feel like they've been thinking about this exact thing
+
+STRUCTURE:
+- Use subheadings that are themselves interesting (not just "Introduction", "Point 1")
+- Each section should have a mini-hook
+- Include at least one unexpected insight or counterintuitive point
+- Add a "quotable" line that readers would want to highlight/share
+- End with something that lingers - a question, a challenge, or a perspective shift
+
+FORMATTING FOR READABILITY:
+- Short paragraphs (2-4 sentences max)
+- Strategic bold for key phrases readers might skim for
+- Use > blockquotes for memorable lines or key takeaways
+- Lists only when they genuinely help, not as filler
+
+VOICE:
+- Write like a smart friend explaining something over drinks
+- Be specific and concrete, not abstract and generic
+- Include your genuine reaction to the ideas ("this blew my mind", "I was skeptical at first")
+- Don't over-explain. Trust the reader's intelligence.
+
+OUTPUT FORMAT:
+- Start with the title (# heading)
+- Then a blank line
+- Then dive straight into the hook - no meta-commentary about what you're going to write
+
+Here's the transcription to transform:
+${transcriptions}`;
+
   const completion = await openai.chat.completions.create({
     messages: [
-      {
-        role: "system",
-        content:
-          "You are a skilled content writer that converts audio transcriptions into well-structured, engaging blog posts in Markdown format. Create a comprehensive blog post with a catchy title, introduction, main body with multiple sections, and a conclusion. Analyze the user's writing style from their previous posts and emulate their tone and style in the new post. Keep the tone casual and professional.",
-      },
-      {
-        role: "user",
-        content: `Here are some of my previous blog posts for reference:
-
-${userPosts}
-Please convert the following transcription into a high-quality, professional blog post using Markdown formatting. Follow these instructions carefully:
-
-1. Start with a **SEO-optimized, catchy title** on the first line that sparks curiosity and encourages clicks.
-2. Add **a new line** after the title.
-3. Begin with an **engaging introduction paragraph** that hooks the reader, clearly explains the topic, and sets the tone for the article.
-4. Structure the main content into **clear sections** using Markdown headings (## for main sections, ### for subheadings).
-5. Include **bullet points, numbered lists, and tables** where appropriate to make complex ideas easy to digest.
-6. Add **examples, analogies, or mini case studies** where relevant to make the content practical and relatable.
-7. Use **transitional sentences and storytelling techniques** to maintain flow between sections.
-8. Write a **conclusion paragraph** that summarizes key points, reinforces the value, and provides a call-to-action if applicable.
-9. Maintain an **informative, authoritative, yet approachable tone** throughout. Avoid generic phrasing.
-10. **Emulate my writing style, tone, and recurring patterns** from my previous posts — maintain the same sentence rhythm, vocabulary, and energy.
-11. Ensure the content is **original, creative, and hard to distinguish from content written by a human expert**.
-12. Use **natural language, rhetorical questions, and varied sentence structures** to make the post engaging.
-13. Format all Markdown elements correctly — headings, lists, bold/italics, links, and code blocks if needed.
-
-Produce a final, polished Markdown blog post that reads like it was written by an expert content writer with deep knowledge of the subject.
-
-Here's the transcription to convert: ${transcriptions}`,
-      },
+      { role: "system", content: systemPrompt },
+      { role: "user", content: userPrompt },
     ],
     model: "gpt-4o-mini",
-    temperature: 0.7,
-    max_tokens: 1000,
+    temperature: 0.9, // Higher temperature for more creative, varied output
+    max_tokens: 2000, // More tokens for richer content
+    presence_penalty: 0.6, // Encourages more diverse vocabulary
+    frequency_penalty: 0.4, // Reduces repetitive phrases
   });
 
   return completion.choices[0].message.content;

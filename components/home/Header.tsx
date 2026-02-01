@@ -70,7 +70,7 @@ export default function Header() {
 
           <SignedOut>
             <SignInButton>
-              <NavLink href="/sign-in">Sign In</NavLink>
+              <NavLink href="/sign-in">Get Started</NavLink>
             </SignInButton>
           </SignedOut>
         </div>
@@ -107,7 +107,7 @@ export default function Header() {
             <SignedOut>
               <SignInButton>
                 <NavLink href="/sign-in" onClick={closeMenu}>
-                  Sign In
+                  Get Started
                 </NavLink>
               </SignInButton>
             </SignedOut>

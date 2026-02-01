@@ -133,6 +133,17 @@ const UploadForm = () => {
           });
         }
       } catch (err) {
+        // Next.js redirect() throws a special error - let it propagate
+        if (
+          err &&
+          typeof err === "object" &&
+          "digest" in err &&
+          typeof (err as { digest: unknown }).digest === "string" &&
+          (err as { digest: string }).digest.startsWith("NEXT_REDIRECT")
+        ) {
+          throw err;
+        }
+
         console.error(err);
         const e = err as { code?: string; message?: string };
         const code = e?.code ?? e?.message;
