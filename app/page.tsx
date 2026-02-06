@@ -6,13 +6,13 @@ import BgGradient from "@/components/common/bg-gradient";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "AI Content Generator - Transform Your Media into Engaging Content",
+  title: "AI Content Generator - Transform Media into Content",
   description:
-    "Easily convert your audio and video files into captivating blog posts. Our AI-powered content generator analyzes your media and creates engaging, SEO-friendly articles in minutes. Perfect for bloggers, marketers, and content creators looking to repurpose their media content effortlessly.",
+    "Convert audio and video files into captivating blog posts with our AI-powered content generator. Create SEO-friendly articles in minutes.",
   openGraph: {
-    title: "AI Content Generator - Transform Your Media into Engaging Content",
+    title: "AI Content Generator - Transform Media into Content",
     description:
-      "Easily convert your audio and video files into captivating blog posts. Our AI-powered content generator analyzes your media and creates engaging, SEO-friendly articles in minutes. Perfect for bloggers, marketers, and content creators looking to repurpose their media content effortlessly.",
+      "Convert audio and video files into captivating blog posts with our AI-powered content generator. Create SEO-friendly articles in minutes.",
     url: "https://speak2page.app",
     siteName: "AI Content Generator",
   },
