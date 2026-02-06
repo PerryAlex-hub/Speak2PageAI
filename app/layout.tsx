@@ -37,7 +37,7 @@ const fontSans = localFont({
 export const metadata: Metadata = {
   title: "Speak2Page",
   description:
-    "Convert your video or audio into a Blog Post in seconds with the power of AI.",
+    "Speak2Page is an AI-powered application that transforms your voice into written content. Simply speak, and our advanced speech recognition technology converts your words into beautifully formatted pages. Perfect for content creators, students, and professionals who want to boost productivity and streamline their writing workflow.",
   icons: {
     icon: "/icon.ico",
   },
