@@ -46,7 +46,7 @@ export default function Header() {
                 height={32}
                 className="hover:rotate-12 transform transition duration-200 ease-in-out"
               />
-              <span className="font-extrabold text-lg">SpeakEasy</span>
+              <span className="font-extrabold text-lg">Speak2Page</span>
             </span>
           </NavLink>
         </div>

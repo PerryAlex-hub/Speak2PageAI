@@ -9,6 +9,12 @@ import {
   transcribeUploadedFile,
   generateBlogPostAction,
 } from "@/actions/upload-actions";
+import {
+  WRITING_TONES,
+  WORD_COUNT_OPTIONS,
+  type WritingTone,
+  type WordCountOption,
+} from "@/lib/blog-options";
 
 const schema = z.object({
   file: z
@@ -27,6 +33,8 @@ const schema = z.object({
 const UploadForm = () => {
   const [isUploading, setIsUploading] = useState(false);
   const [isTranscribing, setIsTranscribing] = useState(false);
+  const [selectedTone, setSelectedTone] = useState<WritingTone>("conversational");
+  const [selectedLength, setSelectedLength] = useState<WordCountOption>("medium");
 
   const { startUpload } = useUploadThing("videoOrAudioUploader", {
     onClientUploadComplete: (res) => {
@@ -124,6 +132,8 @@ const UploadForm = () => {
           await generateBlogPostAction({
             transcriptions: normalizedTranscriptions[0],
             userId: data.userId,
+            tone: selectedTone,
+            wordCountOption: selectedLength,
           });
 
           toast.success("Blog post generated successfully!", {
@@ -165,6 +175,49 @@ const UploadForm = () => {
 
   return (
     <form className="flex flex-col gap-6" action={handleTranscribe}>
+      {/* Tone Selection */}
+      <div className="flex flex-col gap-2">
+        <label className="text-sm font-medium text-gray-700">Writing Tone</label>
+        <select
+          value={selectedTone}
+          onChange={(e) => setSelectedTone(e.target.value as WritingTone)}
+          disabled={isUploading || isTranscribing}
+          className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:border-purple-500 focus:outline-none focus:ring-1 focus:ring-purple-500 disabled:cursor-not-allowed disabled:opacity-50"
+        >
+          {WRITING_TONES.map((tone) => (
+            <option key={tone.id} value={tone.id}>
+              {tone.name}
+            </option>
+          ))}
+        </select>
+        <p className="text-xs text-gray-500">
+          {WRITING_TONES.find((t) => t.id === selectedTone)?.description}
+        </p>
+      </div>
+
+      {/* Length Selection */}
+      <div className="flex flex-col gap-2">
+        <label className="text-sm font-medium text-gray-700">Content Length</label>
+        <div className="flex gap-2">
+          {WORD_COUNT_OPTIONS.map((option) => (
+            <button
+              key={option.id}
+              type="button"
+              onClick={() => setSelectedLength(option.id)}
+              disabled={isUploading || isTranscribing}
+              className={`flex-1 rounded-md border px-3 py-2 text-sm font-medium transition-colors ${
+                selectedLength === option.id
+                  ? "border-purple-600 bg-purple-50 text-purple-700"
+                  : "border-gray-300 bg-white text-gray-700 hover:border-gray-400"
+              } disabled:cursor-not-allowed disabled:opacity-50`}
+            >
+              {option.name}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* File Upload */}
       <div className="flex justify-end items-center gap-1.5">
         <Input
           id="file"

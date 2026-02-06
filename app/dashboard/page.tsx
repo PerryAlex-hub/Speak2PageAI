@@ -13,6 +13,26 @@ import {
 } from "@/lib/user-helpers";
 import { currentUser } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Dashboard - AI Content Generator",
+  description:
+    "Welcome to your dashboard! Here you can upload your audio and video files to generate engaging blog posts using our AI-powered content generator. Manage your account, view your subscription plan, and start creating captivating content today.",
+  openGraph: {
+    title: "Dashboard - AI Content Generator",
+    description:
+      "Welcome to your dashboard! Here you can upload your audio and video files to generate engaging blog posts using our AI-powered content generator. Manage your account, view your subscription plan, and start creating captivating content today.",
+    url: "https://speak2page.app/dashboard",
+    siteName: "AI Content Generator",
+  },
+  keywords: [
+    "dashboard",
+    "AI content generator dashboard",
+    "upload media",
+    "manage account",
+  ],
+};
 
 const Dashboard = async () => {
   const clerkUser = await currentUser();
@@ -21,7 +41,7 @@ const Dashboard = async () => {
   }
   const email = clerkUser?.emailAddresses?.[0].emailAddress ?? "";
   const fullName =
-    `${clerkUser?.firstName ?? ""}${clerkUser?.lastName ?? ""}`.trim();
+    `${clerkUser?.firstName ?? ""} ${clerkUser?.lastName ?? ""}`.trim();
   const sql = await getDbConnection();
   const user = await doesUserExist(sql, email);
   let userId = null;
