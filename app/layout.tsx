@@ -41,6 +41,11 @@ export const metadata: Metadata = {
   icons: {
     icon: "/icon.ico",
   },
+  openGraph: {
+    title: "Speak2Page - Transform Your Voice and Video into Written Content",
+    description:
+      "Speak2Page is an AI-powered application that transforms your voice into written content. Simply speak, and our advanced speech recognition technology converts your words into beautifully formatted pages. Perfect for content creators, students, and professionals who want to boost productivity and streamline their writing workflow.",
+  },
   metadataBase: new URL("https://www.speak2page.app"),
   alternates: {
     canonical: "https://www.speak2page.app",
